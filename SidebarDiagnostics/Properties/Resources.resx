@@ -808,6 +808,22 @@
     <value>Picks a color preset for the sidebar and app windows. You can still fine-tune individual colors afterward on the Customize tab.</value>
     <comment>Settings theme tooltip</comment>
   </data>
+  <data name="ThemeHighContrastDark" xml:space="preserve">
+    <value>High-Contrast Dark</value>
+    <comment>Theme name</comment>
+  </data>
+  <data name="ThemeModernFlat" xml:space="preserve">
+    <value>Modern Flat</value>
+    <comment>Theme name</comment>
+  </data>
+  <data name="ThemeGamingRGB" xml:space="preserve">
+    <value>Gaming RGB</value>
+    <comment>Theme name</comment>
+  </data>
+  <data name="ThemeFluentMica" xml:space="preserve">
+    <value>Windows 11 Fluent</value>
+    <comment>Theme name</comment>
+  </data>
   <data name="SettingsScreen" xml:space="preserve">
     <value>Screen</value>
     <comment>Screen settings label</comment>

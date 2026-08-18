@@ -797,6 +797,30 @@
     <value>تشغيل مع الويندوز.</value>
     <comment>Settings run at startup label</comment>
   </data>
+  <data name="SettingsTheme" xml:space="preserve">
+    <value>المظهر</value>
+    <comment>Settings theme label</comment>
+  </data>
+  <data name="SettingsThemeTooltip" xml:space="preserve">
+    <value>اختر مجموعة ألوان جاهزة للشريط الجانبي ونوافذ التطبيق. يمكنك تعديل الألوان يدويًا لاحقًا من تبويب التخصيص.</value>
+    <comment>Settings theme tooltip</comment>
+  </data>
+  <data name="ThemeHighContrastDark" xml:space="preserve">
+    <value>داكن عالي التباين</value>
+    <comment>Theme name</comment>
+  </data>
+  <data name="ThemeModernFlat" xml:space="preserve">
+    <value>مسطح عصري</value>
+    <comment>Theme name</comment>
+  </data>
+  <data name="ThemeGamingRGB" xml:space="preserve">
+    <value>ألعاب RGB</value>
+    <comment>Theme name</comment>
+  </data>
+  <data name="ThemeFluentMica" xml:space="preserve">
+    <value>ويندوز 11 Fluent</value>
+    <comment>Theme name</comment>
+  </data>
   <data name="SettingsRunAtStartupTooltip" xml:space="preserve">
     <value>تشغيل الأداة عندما يشتغل الويندوز.</value>
     <comment>Settings run at startup tooltip</comment>

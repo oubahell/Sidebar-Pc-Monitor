@@ -14,6 +14,25 @@ namespace SidebarDiagnostics.Models
 {
     public class SettingsModel : INotifyPropertyChanged
     {
+        private static string LocalizedThemeName(ThemeKind kind)
+        {
+            switch (kind)
+            {
+                case ThemeKind.ModernFlat:
+                    return Resources.ThemeModernFlat;
+
+                case ThemeKind.GamingRGB:
+                    return Resources.ThemeGamingRGB;
+
+                case ThemeKind.FluentMica:
+                    return Resources.ThemeFluentMica;
+
+                case ThemeKind.HighContrastDark:
+                default:
+                    return Resources.ThemeHighContrastDark;
+            }
+        }
+
         public SettingsModel(Sidebar sidebar)
         {
             DockEdgeItems = new DockItem[2]
@@ -24,7 +43,7 @@ namespace SidebarDiagnostics.Models
 
             DockEdge = Framework.Settings.Instance.DockEdge;
 
-            ThemeItems = ThemePreset.All.Select(t => new ThemeItem() { Value = t.Kind, Text = t.DisplayName }).ToArray();
+            ThemeItems = ThemePreset.All.Select(t => new ThemeItem() { Value = t.Kind, Text = LocalizedThemeName(t.Kind) }).ToArray();
 
             Theme = Framework.Settings.Instance.Theme;
 

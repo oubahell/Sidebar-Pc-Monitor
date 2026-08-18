@@ -1661,6 +1661,42 @@ namespace SidebarDiagnostics.Framework {
                 return ResourceManager.GetString("SettingsThemeTooltip", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to High-Contrast Dark.
+        /// </summary>
+        public static string ThemeHighContrastDark {
+            get {
+                return ResourceManager.GetString("ThemeHighContrastDark", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Modern Flat.
+        /// </summary>
+        public static string ThemeModernFlat {
+            get {
+                return ResourceManager.GetString("ThemeModernFlat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Gaming RGB.
+        /// </summary>
+        public static string ThemeGamingRGB {
+            get {
+                return ResourceManager.GetString("ThemeGamingRGB", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Windows 11 Fluent.
+        /// </summary>
+        public static string ThemeFluentMica {
+            get {
+                return ResourceManager.GetString("ThemeFluentMica", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Screen.

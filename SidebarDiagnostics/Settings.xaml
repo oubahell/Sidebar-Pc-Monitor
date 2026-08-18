@@ -294,21 +294,21 @@
                                                             </Style>
                                                         </ContentControl.Style>
                                                         <ContentControl.Resources>
-                                                            <Style TargetType="{x:Type CheckBox}">
+                                                            <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
                                                                 <Setter Property="VerticalAlignment" Value="Center" />
                                                                 <Setter Property="Margin" Value="0,5" />
                                                             </Style>
-                                                            
+
                                                             <Style TargetType="{x:Type StackPanel}">
                                                                 <Setter Property="Orientation" Value="Horizontal" />
                                                                 <Setter Property="Margin" Value="0,5" />
                                                                 <Style.Resources>
-                                                                    <Style TargetType="{x:Type Label}">
+                                                                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
                                                                         <Setter Property="VerticalAlignment" Value="Center" />
                                                                         <Setter Property="Margin" Value="0,0,10,0" />
                                                                         <Setter Property="Padding" Value="0" />
                                                                     </Style>
-                                                                    <Style TargetType="{x:Type TextBox}">
+                                                                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                                                                         <Setter Property="VerticalAlignment" Value="Center" />
                                                                         <Setter Property="Width" Value="40" />
                                                                         <Setter Property="MaxLines" Value="1" />
