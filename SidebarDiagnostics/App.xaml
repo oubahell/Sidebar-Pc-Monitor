@@ -12,6 +12,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/HighContrastDark.xaml" />
                 <ResourceDictionary Source="FlatStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 

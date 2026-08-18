@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using SidebarDiagnostics.Utilities;
@@ -173,6 +174,23 @@ namespace SidebarDiagnostics.Framework
                 _alwaysTop = value;
 
                 NotifyPropertyChanged("AlwaysTop");
+            }
+        }
+
+        private ThemeKind _theme { get; set; } = ThemeKind.HighContrastDark;
+
+        [JsonProperty]
+        public ThemeKind Theme
+        {
+            get
+            {
+                return _theme;
+            }
+            set
+            {
+                _theme = value;
+
+                NotifyPropertyChanged("Theme");
             }
         }
 
@@ -638,6 +656,74 @@ namespace SidebarDiagnostics.Framework
     {
         Left,
         Right
+    }
+
+    public enum ThemeKind : byte
+    {
+        HighContrastDark,
+        ModernFlat,
+        GamingRGB,
+        FluentMica
+    }
+
+    public sealed class ThemePreset
+    {
+        public ThemeKind Kind { get; set; }
+        public string DisplayName { get; set; }
+        public string BGColor { get; set; }
+        public double BGOpacity { get; set; }
+        public string FontColor { get; set; }
+        public string AlertFontColor { get; set; }
+        public string ResourcePath { get; set; }
+
+        public static readonly ThemePreset[] All = new ThemePreset[]
+        {
+            new ThemePreset()
+            {
+                Kind = ThemeKind.HighContrastDark,
+                DisplayName = "High-Contrast Dark",
+                BGColor = "#000000",
+                BGOpacity = 0.9d,
+                FontColor = "#FFFFFF",
+                AlertFontColor = "#FF4136",
+                ResourcePath = "Themes/HighContrastDark.xaml"
+            },
+            new ThemePreset()
+            {
+                Kind = ThemeKind.ModernFlat,
+                DisplayName = "Modern Flat",
+                BGColor = "#1E1E2E",
+                BGOpacity = 0.85d,
+                FontColor = "#E4E4E7",
+                AlertFontColor = "#F59E0B",
+                ResourcePath = "Themes/ModernFlat.xaml"
+            },
+            new ThemePreset()
+            {
+                Kind = ThemeKind.GamingRGB,
+                DisplayName = "Gaming RGB",
+                BGColor = "#0A0A12",
+                BGOpacity = 0.88d,
+                FontColor = "#00F0FF",
+                AlertFontColor = "#FF2D75",
+                ResourcePath = "Themes/GamingRGB.xaml"
+            },
+            new ThemePreset()
+            {
+                Kind = ThemeKind.FluentMica,
+                DisplayName = "Windows 11 Fluent",
+                BGColor = "#202020",
+                BGOpacity = 0.72d,
+                FontColor = "#F3F3F3",
+                AlertFontColor = "#FF6B6B",
+                ResourcePath = "Themes/FluentMica.xaml"
+            }
+        };
+
+        public static ThemePreset Get(ThemeKind kind)
+        {
+            return All.First(t => t.Kind == kind);
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]

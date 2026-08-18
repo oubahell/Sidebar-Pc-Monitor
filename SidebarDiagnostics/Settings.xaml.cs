@@ -32,6 +32,8 @@ namespace SidebarDiagnostics
         {
             Model.Save();
 
+            App.ApplyTheme(Model.Theme);
+
             await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, (Action)(async () =>
             {
                 Sidebar _sidebar = App.Current.Sidebar;

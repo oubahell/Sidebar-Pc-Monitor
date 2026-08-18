@@ -59,6 +59,7 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="38px"></RowDefinition>
                     </Grid.RowDefinitions>
 
                     <Label Grid.Column="0" Grid.Row="0" Content="{x:Static frame:Resources.SettingsDock}" />
@@ -81,6 +82,9 @@
 
                     <Label Grid.Column="0" Grid.Row="6" Content="{x:Static frame:Resources.SettingsRunAtStartup}" />
                     <CheckBox Grid.Column="1" Grid.Row="6" IsChecked="{Binding Path=RunAtStartup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsRunAtStartupTooltip}" />
+
+                    <Label Grid.Column="0" Grid.Row="7" Content="{x:Static frame:Resources.SettingsTheme}" />
+                    <ComboBox Grid.Column="1" Grid.Row="7" ItemsSource="{Binding Path=ThemeItems, Mode=OneWay}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedValue="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsThemeTooltip}" />
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static frame:Resources.SettingsAdvancedTab}">

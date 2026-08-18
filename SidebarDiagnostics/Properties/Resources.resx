@@ -800,6 +800,14 @@
     <value>Runs the app when you first log in.</value>
     <comment>Settings run at startup tooltip</comment>
   </data>
+  <data name="SettingsTheme" xml:space="preserve">
+    <value>Theme</value>
+    <comment>Settings theme label</comment>
+  </data>
+  <data name="SettingsThemeTooltip" xml:space="preserve">
+    <value>Picks a color preset for the sidebar and app windows. You can still fine-tune individual colors afterward on the Customize tab.</value>
+    <comment>Settings theme tooltip</comment>
+  </data>
   <data name="SettingsScreen" xml:space="preserve">
     <value>Screen</value>
     <comment>Screen settings label</comment>

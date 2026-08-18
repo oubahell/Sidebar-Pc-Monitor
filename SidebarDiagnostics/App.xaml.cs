@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
@@ -46,6 +47,9 @@ namespace SidebarDiagnostics
 
             // SETTINGS
             CheckSettings();
+
+            // THEME
+            ApplyTheme(Framework.Settings.Instance.Theme);
 
             // VERSION
             Version _version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -95,6 +99,29 @@ namespace SidebarDiagnostics
         public static void RefreshIcon()
         {
             TrayIcon.Visibility = Framework.Settings.Instance.ShowTrayIcon ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public static void ApplyTheme(Framework.ThemeKind theme)
+        {
+            ResourceDictionary _themeDict = new ResourceDictionary()
+            {
+                Source = new Uri(Framework.ThemePreset.Get(theme).ResourcePath, UriKind.Relative)
+            };
+
+            Collection<ResourceDictionary> _merged = Current.Resources.MergedDictionaries;
+
+            ResourceDictionary _existing = _merged.FirstOrDefault(d => d.Source != null && d.Source.OriginalString.StartsWith("Themes/", StringComparison.OrdinalIgnoreCase));
+
+            if (_existing != null)
+            {
+                int _index = _merged.IndexOf(_existing);
+                _merged.RemoveAt(_index);
+                _merged.Insert(_index, _themeDict);
+            }
+            else
+            {
+                _merged.Insert(0, _themeDict);
+            }
         }
 
         public static void ShowPerformanceCounterError()

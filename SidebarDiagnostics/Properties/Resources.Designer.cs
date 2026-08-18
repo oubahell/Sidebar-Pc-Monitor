@@ -1643,6 +1643,24 @@ namespace SidebarDiagnostics.Framework {
                 return ResourceManager.GetString("SettingsRunAtStartupTooltip", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Theme.
+        /// </summary>
+        public static string SettingsTheme {
+            get {
+                return ResourceManager.GetString("SettingsTheme", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Picks a color preset for the sidebar and app windows. You can still fine-tune individual colors afterward on the Customize tab..
+        /// </summary>
+        public static string SettingsThemeTooltip {
+            get {
+                return ResourceManager.GetString("SettingsThemeTooltip", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Screen.

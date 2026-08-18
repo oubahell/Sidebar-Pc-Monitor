@@ -24,6 +24,10 @@ namespace SidebarDiagnostics.Models
 
             DockEdge = Framework.Settings.Instance.DockEdge;
 
+            ThemeItems = ThemePreset.All.Select(t => new ThemeItem() { Value = t.Kind, Text = t.DisplayName }).ToArray();
+
+            Theme = Framework.Settings.Instance.Theme;
+
             Monitor[] _monitors = Monitor.GetMonitors();
 
             ScreenItems = _monitors.Select((s, i) => new ScreenItem() { Index = i, Text = string.Format("#{0}", i + 1) }).ToArray();
@@ -134,6 +138,7 @@ namespace SidebarDiagnostics.Models
             }
 
             Framework.Settings.Instance.DockEdge = DockEdge;
+            Framework.Settings.Instance.Theme = Theme;
             Framework.Settings.Instance.ScreenIndex = ScreenIndex;
             Framework.Settings.Instance.Culture = Culture;
             Framework.Settings.Instance.UIScale = UIScale;
@@ -317,6 +322,45 @@ namespace SidebarDiagnostics.Models
                 _dockEdgeItems = value;
 
                 NotifyPropertyChanged("DockEdgeItems");
+            }
+        }
+
+        private ThemeKind _theme { get; set; }
+
+        public ThemeKind Theme
+        {
+            get
+            {
+                return _theme;
+            }
+            set
+            {
+                _theme = value;
+
+                ThemePreset _preset = ThemePreset.Get(value);
+
+                BGColor = _preset.BGColor;
+                BGOpacity = _preset.BGOpacity;
+                FontColor = _preset.FontColor;
+                AlertFontColor = _preset.AlertFontColor;
+
+                NotifyPropertyChanged("Theme");
+            }
+        }
+
+        private ThemeItem[] _themeItems { get; set; }
+
+        public ThemeItem[] ThemeItems
+        {
+            get
+            {
+                return _themeItems;
+            }
+            set
+            {
+                _themeItems = value;
+
+                NotifyPropertyChanged("ThemeItems");
             }
         }
 
@@ -1020,6 +1064,13 @@ namespace SidebarDiagnostics.Models
     public class DockItem
     {
         public DockEdge Value { get; set; }
+
+        public string Text { get; set; }
+    }
+
+    public class ThemeItem
+    {
+        public ThemeKind Value { get; set; }
 
         public string Text { get; set; }
     }

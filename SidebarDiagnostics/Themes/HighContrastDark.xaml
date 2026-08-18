@@ -1,0 +1,15 @@
+<ResourceDictionary
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- High-Contrast Dark: closest to the app's original look, just darker window chrome. -->
+
+    <SolidColorBrush x:Key="ChromeBackgroundBrush" Color="#12141A" />
+    <SolidColorBrush x:Key="ChromeForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ChromeBorderBrush" Color="#3A3F4B" />
+    <SolidColorBrush x:Key="ChromeAccentBrush" Color="#3498DB" />
+    <SolidColorBrush x:Key="ChromeAccentHoverBrush" Color="#2980B9" />
+    <SolidColorBrush x:Key="ChromeMutedBrush" Color="#888888" />
+    <Color x:Key="ChromeShadowColor">#000000</Color>
+
+</ResourceDictionary>

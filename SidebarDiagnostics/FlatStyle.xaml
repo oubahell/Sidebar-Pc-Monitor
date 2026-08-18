@@ -75,8 +75,8 @@
     <Style x:Key="FlatWindowStyle" TargetType="{x:Type style:FlatWindow}">
         <Setter Property="WindowStyle" Value="None" />
         <Setter Property="ResizeMode" Value="NoResize" />
-        <Setter Property="Background" Value="#FFFFFF" />
-        <Setter Property="BorderBrush" Value="#BDC3C7" />
+        <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="AllowsTransparency" Value="True" />
         <Setter Property="Template">
@@ -84,7 +84,7 @@
                 <ControlTemplate TargetType="{x:Type style:FlatWindow}">
                     <Border x:Name="PART_BORDER" Margin="10" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="10" Direction="-90" ShadowDepth="2" Opacity="0.5" Color="#333333" />
+                            <DropShadowEffect BlurRadius="10" Direction="-90" ShadowDepth="2" Opacity="0.5" Color="{DynamicResource ChromeShadowColor}" />
                         </Border.Effect>
                         <Grid>
                             <DockPanel LastChildFill="True">
@@ -92,7 +92,7 @@
                                     <DockPanel LastChildFill="False">
                                         <Image x:Name="PART_ICON" DockPanel.Dock="Left" Source="{TemplateBinding Icon}" Width="16" Height="16" Margin="10,0,0,0" VerticalAlignment="Center" />
 
-                                        <TextBlock x:Name="PART_TITLE" DockPanel.Dock="Left" Text="{TemplateBinding Title}" Margin="8,0,0,1" Padding="0" VerticalAlignment="Center" Foreground="#333333" FontSize="12" />
+                                        <TextBlock x:Name="PART_TITLE" DockPanel.Dock="Left" Text="{TemplateBinding Title}" Margin="8,0,0,1" Padding="0" VerticalAlignment="Center" Foreground="{DynamicResource ChromeForegroundBrush}" FontSize="12" />
 
                                         <Button x:Name="PART_CLOSE" DockPanel.Dock="Right" Click="PART_CLOSE_Click" Style="{StaticResource FlatButtonRed}">
                                             <Path Data="M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z" />
@@ -159,7 +159,7 @@
         <Setter Property="Margin" Value="10,0,0,0" />
         <Setter Property="Padding" Value="20,8" />
         <Setter Property="Foreground" Value="#FFFFFF" />
-        <Setter Property="Background" Value="#3498DB" />
+        <Setter Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -174,13 +174,13 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="#666666" />
-                <Setter Property="Background" Value="#FFFFFF" />
-                <Setter Property="BorderBrush" Value="#666666" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ChromeMutedBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#2980B9" />
+                <Setter Property="Background" Value="{DynamicResource ChromeAccentHoverBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
