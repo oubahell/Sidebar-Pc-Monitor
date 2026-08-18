@@ -7,12 +7,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Sidebar Diagnostics")]
-[assembly: AssemblyDescription("Sidebar Diagnostics")]
+[assembly: AssemblyTitle("Sidebar Pc Monitor")]
+[assembly: AssemblyDescription("Sidebar Pc Monitor")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Sidebar Diagnostics")]
-[assembly: AssemblyProduct("Sidebar Diagnostics")]
-[assembly: AssemblyCopyright("Copyright © 2021")]
+[assembly: AssemblyCompany("ObaiDa.A")]
+[assembly: AssemblyProduct("Sidebar Pc Monitor")]
+[assembly: AssemblyCopyright("Copyright © 2026 ObaiDa.A. Based on Sidebar Diagnostics by ArcadeRenegade.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

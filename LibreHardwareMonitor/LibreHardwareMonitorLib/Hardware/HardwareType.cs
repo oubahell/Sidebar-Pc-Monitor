@@ -23,6 +23,5 @@ public enum HardwareType
     Cooler,
     EmbeddedController,
     Psu,
-    Battery,
-    PowerMonitor,
+    Battery
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -142,16 +144,24 @@ namespace SidebarDiagnostics
         {
             string _exe = await SquirrelUpdate(showInfo);
 
-            if (_exe != null)
+            if (_exe != null && File.Exists(_exe))
             {
-                if (Framework.Settings.Instance.RunAtStartup)
+                try
                 {
-                    Utilities.Startup.EnableStartupTask(_exe);
+                    if (Framework.Settings.Instance.RunAtStartup)
+                    {
+                        Utilities.Startup.EnableStartupTask(_exe);
+                    }
+
+                    Process.Start(_exe);
+
+                    Shutdown();
                 }
-
-                Process.Start(_exe);
-
-                Shutdown();
+                catch (Win32Exception)
+                {
+                    // Relaunching the updated build failed (e.g. not running from a Squirrel-managed
+                    // install location). Keep running the current instance instead of crashing.
+                }
             }
         }
 

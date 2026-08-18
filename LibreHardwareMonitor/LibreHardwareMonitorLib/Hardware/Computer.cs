@@ -12,9 +12,7 @@ using System.Linq;
 using LibreHardwareMonitor.Hardware.Battery;
 using LibreHardwareMonitor.Hardware.Controller.AeroCool;
 using LibreHardwareMonitor.Hardware.Controller.AquaComputer;
-using LibreHardwareMonitor.Hardware.Controller.Arctic;
 using LibreHardwareMonitor.Hardware.Controller.Heatmaster;
-using LibreHardwareMonitor.Hardware.Controller.MSI;
 using LibreHardwareMonitor.Hardware.Controller.Nzxt;
 using LibreHardwareMonitor.Hardware.Controller.Razer;
 using LibreHardwareMonitor.Hardware.Controller.TBalancer;
@@ -23,7 +21,6 @@ using LibreHardwareMonitor.Hardware.Gpu;
 using LibreHardwareMonitor.Hardware.Memory;
 using LibreHardwareMonitor.Hardware.Motherboard;
 using LibreHardwareMonitor.Hardware.Network;
-using LibreHardwareMonitor.Hardware.PowerMonitor;
 using LibreHardwareMonitor.Hardware.Psu.Corsair;
 using LibreHardwareMonitor.Hardware.Psu.Msi;
 using LibreHardwareMonitor.Hardware.Storage;
@@ -43,7 +40,6 @@ public class Computer : IComputer
     private bool _controllerEnabled;
     private bool _cpuEnabled;
     private bool _gpuEnabled;
-    private bool _powerMonitorEnabled;
     private bool _memoryEnabled;
     private bool _motherboardEnabled;
     private bool _networkEnabled;
@@ -130,8 +126,6 @@ public class Computer : IComputer
                     Add(new AeroCoolGroup(_settings));
                     Add(new NzxtGroup(_settings));
                     Add(new RazerGroup(_settings));
-                    Add(new ArcticGroup(_settings));
-                    Add(new MsiGroup(_settings));
                 }
                 else
                 {
@@ -141,8 +135,6 @@ public class Computer : IComputer
                     RemoveType<AeroCoolGroup>();
                     RemoveType<NzxtGroup>();
                     RemoveType<RazerGroup>();
-                    RemoveType<ArcticGroup>();
-                    RemoveType<MsiGroup>();
                 }
             }
 
@@ -193,24 +185,6 @@ public class Computer : IComputer
             }
 
             _gpuEnabled = value;
-        }
-    }
-
-    /// <inheritdoc />
-    public bool IsPowerMonitorEnabled
-    {
-        get { return _powerMonitorEnabled; }
-        set
-        {
-            if (_open && value != _powerMonitorEnabled)
-            {
-                if (value)
-                    Add(new PowerMonitorGroup(_settings));
-                else
-                    RemoveType<PowerMonitorGroup>();
-            }
-
-            _powerMonitorEnabled = value;
         }
     }
 
@@ -540,9 +514,6 @@ public class Computer : IComputer
                 Add(new IntelGpuGroup(GetIntelCpus(), _settings));
         }
 
-        if (_powerMonitorEnabled)
-            Add(new PowerMonitorGroup(_settings));
-
         if (_controllerEnabled)
         {
             Add(new TBalancerGroup(_settings));
@@ -551,8 +522,6 @@ public class Computer : IComputer
             Add(new AeroCoolGroup(_settings));
             Add(new NzxtGroup(_settings));
             Add(new RazerGroup(_settings));
-            Add(new ArcticGroup(_settings));
-            Add(new MsiGroup(_settings));
         }
 
         if (_storageEnabled)

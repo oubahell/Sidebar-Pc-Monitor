@@ -176,7 +176,7 @@ namespace SidebarDiagnostics.Framework
             }
         }
 
-        private bool _autoUpdate { get; set; } = true;
+        private bool _autoUpdate { get; set; } = false;
 
         [JsonProperty]
         public bool AutoUpdate

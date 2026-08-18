@@ -76,7 +76,7 @@ public abstract class Hardware : IHardware
     }
 
     /// <inheritdoc />
-    public virtual IHardware[] SubHardware
+    public IHardware[] SubHardware
     {
         get { return Array.Empty<IHardware>(); }
     }

@@ -1,4 +1,4 @@
-// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+﻿// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // Copyright (C) LibreHardwareMonitor and Contributors.
 // All Rights Reserved.
@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Text;
 using LibreHardwareMonitor.Hardware.Cpu;
 using LibreHardwareMonitor.Interop;
@@ -22,7 +21,7 @@ internal class IntelGpuGroup : IGroup
     {
         if (!Software.OperatingSystem.IsUnix)
         {
-            // Initialize Intel GCL for discrete and integrated GPU telemetry
+            // Initialize Intel GCL for discrete GPUs
             bool gclInitialized = false;
 
             try
@@ -57,22 +56,6 @@ internal class IntelGpuGroup : IGroup
                     {
                         try
                         {
-                            // Skip integrated GPUs — they are handled separately by IntelIntegratedGpu
-                            // via the D3D enumeration path below. IGCL's ctlEnumerateDevices returns all
-                            // Intel graphics devices including the iGPU, which would otherwise cause the
-                            // same physical device to appear twice with overlapping sensors.
-                            var props = new IntelGcl.ctl_device_adapter_properties_t
-                            {
-                                Size = (uint)Marshal.SizeOf<IntelGcl.ctl_device_adapter_properties_t>(),
-                                Version = 2
-                            };
-
-                            if (IntelGcl.ctlGetDeviceProperties(handle, ref props) == (int)IntelGcl.ctl_result_t.CTL_RESULT_SUCCESS &&
-                                (props.graphics_adapter_properties & (uint)IntelGcl.ctl_adapter_properties_flag_t.CTL_ADAPTER_PROPERTIES_FLAG_INTEGRATED) != 0)
-                            {
-                                continue;
-                            }
-
                             var gpu = new IntelDiscreteGpu(handle, settings);
                             if (gpu.IsValid)
                             {

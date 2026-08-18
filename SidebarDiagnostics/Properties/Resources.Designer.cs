@@ -61,7 +61,7 @@ namespace SidebarDiagnostics.Framework {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sidebar Diagnostics.
+        ///   Looks up a localized string similar to Sidebar Pc Monitor.
         /// </summary>
         public static string AppName {
             get {
