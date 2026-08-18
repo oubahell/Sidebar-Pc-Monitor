@@ -1,5 +1,16 @@
 ﻿[
 	{
+		"Version": "4.0.0",
+		"Changes": [
+			"Rebranded as Sidebar Pc Monitor.",
+			"Updated to LibreHardwareMonitor v0.9.5.",
+			"Retargeted to .NET Framework 4.8.1 for native Windows 11 support.",
+			"Fixed a startup crash caused by the old auto-updater.",
+			"New app icon.",
+			"Donate option temporarily disabled."
+		]
+	},
+	{
 		"Version": "3.6.3",
 		"Changes": [
 			"Updated Libre Hardware Monitor.",

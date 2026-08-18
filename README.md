@@ -2,6 +2,8 @@
 
 A Windows desktop sidebar that displays live hardware diagnostic information (CPU, RAM, GPU, network, drives, and more).
 
+Maintained by **ObaiDa.A**.
+
 ### About this project
 
 **Sidebar Pc Monitor** is a fork of [**Sidebar Diagnostics**](https://github.com/ArcadeRenegade/SidebarDiagnostics) by [**ArcadeRenegade**](https://github.com/ArcadeRenegade). All credit for the original design and implementation goes to them — huge thanks for building and open-sourcing it.
@@ -9,11 +11,13 @@ A Windows desktop sidebar that displays live hardware diagnostic information (CP
 This fork exists to keep the project moving forward with:
 
 * An updated, current [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) core (the original used an older pinned version).
+* A new visual identity: new name, new icon, and a set of selectable themes.
 * New features and quality-of-life improvements.
-* A reworked visual theme for the displayed stats.
-* Ongoing maintenance.
+* Ongoing maintenance, including Windows 11 support.
 
 If you find this useful, please also check out the original repository and consider supporting **ArcadeRenegade**.
+
+> This fork's own donate link is disabled for now — it'll be added once one exists.
 
 ### Original features
 
@@ -27,7 +31,7 @@ If you find this useful, please also check out the original repository and consi
 
 ### Info
 
-Written in C# / .NET WPF, currently targeting .NET Framework 4.7.2.
+Written in C# / .NET WPF, currently targeting .NET Framework 4.8.1.
 
 You will need to run it as administrator (required by the hardware monitoring library to read sensor data).
 
@@ -35,7 +39,8 @@ Hardware data is provided by [LibreHardwareMonitor](https://github.com/LibreHard
 
 ### Supported OS
 
-* Windows 10 / 11
+* Windows 11
+* Windows 10
 * Windows 8 / 8.1
 * Windows 7
 
