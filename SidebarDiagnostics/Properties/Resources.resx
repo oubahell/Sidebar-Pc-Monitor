@@ -808,6 +808,14 @@
     <value>Picks a color preset for the sidebar and app windows. You can still fine-tune individual colors afterward on the Customize tab.</value>
     <comment>Settings theme tooltip</comment>
   </data>
+  <data name="SettingsResetColors" xml:space="preserve">
+    <value>Reset Colors</value>
+    <comment>Settings reset colors button</comment>
+  </data>
+  <data name="SettingsResetColorsTooltip" xml:space="preserve">
+    <value>Restores the background, font and alert colors to the selected theme's defaults.</value>
+    <comment>Settings reset colors tooltip</comment>
+  </data>
   <data name="ThemeHighContrastDark" xml:space="preserve">
     <value>High-Contrast Dark</value>
     <comment>Theme name</comment>

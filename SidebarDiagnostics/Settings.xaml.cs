@@ -304,6 +304,11 @@ namespace SidebarDiagnostics
             await Save(false);
         }
 
+        private void ResetColorsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Model.ResetColorsToTheme();
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             if (Model.IsChanged)

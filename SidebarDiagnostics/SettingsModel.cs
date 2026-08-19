@@ -356,15 +356,25 @@ namespace SidebarDiagnostics.Models
             {
                 _theme = value;
 
-                ThemePreset _preset = ThemePreset.Get(value);
-
-                BGColor = _preset.BGColor;
-                BGOpacity = _preset.BGOpacity;
-                FontColor = _preset.FontColor;
-                AlertFontColor = _preset.AlertFontColor;
+                ResetColorsToTheme();
 
                 NotifyPropertyChanged("Theme");
             }
+        }
+
+        /// <summary>
+        /// Restores the colour settings to the selected theme's preset values, discarding any
+        /// manual tweaks made with the colour pickers.
+        /// </summary>
+        public void ResetColorsToTheme()
+        {
+            ThemePreset _preset = ThemePreset.Get(_theme);
+
+            AutoBGColor = false;
+            BGColor = _preset.BGColor;
+            BGOpacity = _preset.BGOpacity;
+            FontColor = _preset.FontColor;
+            AlertFontColor = _preset.AlertFontColor;
         }
 
         private ThemeItem[] _themeItems { get; set; }

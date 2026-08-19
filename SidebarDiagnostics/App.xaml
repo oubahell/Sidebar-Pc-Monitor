@@ -361,8 +361,29 @@
                 <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CaretBrush" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Setter Property="Padding" Value="4,2" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TextBox}">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
+                                <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="NumberBoxStyle" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="DockPanel.Dock" Value="Right" />
+                <Setter Property="Width" Value="50" />
+                <Setter Property="Margin" Value="5,0,0,0" />
             </Style>
 
             <Style TargetType="{x:Type CheckBox}">
@@ -441,6 +462,70 @@
                 </Setter>
             </Style>
 
+            <Style TargetType="{x:Type ToolTip}">
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="HasDropShadow" Value="True" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToolTip}">
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
+                                <ContentPresenter Margin="{TemplateBinding Padding}" TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--
+                The Xceed ColorPicker paints its own toggle button white from inside its default
+                template, so setting Background/Foreground on the picker itself has no effect.
+                It exposes a ButtonStyle property for exactly this, which restyles the button
+                without replacing the picker template (that would break the palette popup parts).
+            -->
+            <Style x:Key="ColorPickerToggleStyle" TargetType="{x:Type ToggleButton}">
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Padding" Value="4,2" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
+                                <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource ChromeAccentBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type xctk:ColorPicker}">
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+                <Setter Property="ButtonStyle" Value="{StaticResource ColorPickerToggleStyle}" />
+            </Style>
+
+            <Style TargetType="{x:Type xctk:CheckComboBox}">
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+            </Style>
+
             <Style x:Key="SettingGrid" TargetType="{x:Type Grid}">
                 <Style.Resources>
                     <Style TargetType="{x:Type FrameworkElement}">
@@ -453,7 +538,9 @@
                     <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
                         <Setter Property="VerticalAlignment" Value="Center" />
                     </Style>
-                    <Style TargetType="{x:Type xctk:CheckComboBox}" BasedOn="{StaticResource {x:Type FrameworkElement}}" />
+                    <Style TargetType="{x:Type xctk:CheckComboBox}" BasedOn="{StaticResource {x:Type xctk:CheckComboBox}}">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                         <Setter Property="VerticalAlignment" Value="Center" />
                     </Style>
@@ -475,11 +562,18 @@
                             </Style>
                         </Style.Resources>
                     </Style>
-                    <Style TargetType="{x:Type xctk:ColorPicker}">
+                    <Style TargetType="{x:Type xctk:ColorPicker}" BasedOn="{StaticResource {x:Type xctk:ColorPicker}}">
                         <Setter Property="Margin" Value="0,6" />
                         <Setter Property="UsingAlphaChannel" Value="False" />
                         <Setter Property="ColorMode" Value="ColorCanvas" />
-                        <Setter Property="DisplayColorAndName" Value="True" />
+                        <!--
+                            Xceed paints the swatch+hex row on a hardcoded white background from inside
+                            its own template, which left the light-gray hex text unreadable on the dark
+                            theme. Showing the swatch alone (with the hex still available on hover via
+                            DisplayColorTooltip) avoids that without replacing the whole picker template.
+                        -->
+                        <Setter Property="DisplayColorAndName" Value="False" />
+                        <Setter Property="DisplayColorTooltip" Value="True" />
                         <Setter Property="ShowStandardColors" Value="False" />
                         <Setter Property="AdvancedButtonHeader" Value="Advanced" />
                         <Setter Property="AvailableColorsHeader" Value="Colors" />
@@ -524,20 +618,49 @@
                 <Setter Property="CanUserDeleteRows" Value="False" />
                 <Setter Property="GridLinesVisibility" Value="None" />
                 <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="RowBackground" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="AlternatingRowBackground" Value="{DynamicResource ChromeBackgroundBrush}" />
+                <Setter Property="RowHeaderWidth" Value="0" />
                 <Style.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#E1E7E9" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#3A6EA5" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#3A6EA5" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
                     <Style TargetType="{x:Type DataGridCell}">
                         <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                        <Setter Property="Padding" Value="0" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    <Style TargetType="{x:Type DataGridRowHeader}">
+                        <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
                     </Style>
                 </Style.Resources>
             </Style>
 
             <Style x:Key="HardwareGrid" TargetType="{x:Type ListView}">
                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
             </Style>
 
             <Style x:Key="MonitorGridHeader" TargetType="{x:Type DataGridColumnHeader}">
                 <Setter Property="Padding" Value="12,4" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+                <Setter Property="BorderThickness" Value="0,0,1,1" />
+                <Setter Property="SeparatorVisibility" Value="Collapsed" />
             </Style>
 
             <Style x:Key="MonitorGridHeaderCenter" TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MonitorGridHeader}">
@@ -545,7 +668,7 @@
             </Style>
 
             <Style x:Key="MonitorDetailsBorder" TargetType="{x:Type Border}">
-                <Setter Property="Background" Value="#ECF0F1" />
+                <Setter Property="Background" Value="{DynamicResource ChromeBorderBrush}" />
                 <Setter Property="Padding" Value="15,15,15,5" />
             </Style>
 
@@ -554,6 +677,7 @@
                 <Setter Property="Focusable" Value="False" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
                         <Setter Property="Background" Value="Transparent" />
@@ -566,21 +690,25 @@
                 <Setter Property="Padding" Value="12,4" />
                 <Setter Property="IsHitTestVisible" Value="False" />
                 <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
             </Style>
 
             <Style x:Key="MonitorHardwareHeaderCenter" TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource MonitorHardwareHeader}">
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
             </Style>
 
-            <Style x:Key="MonitorHardwareCheckbox" TargetType="{x:Type CheckBox}">
+            <Style x:Key="MonitorHardwareCheckbox" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource {x:Type CheckBox}}">
                 <Setter Property="Margin" Value="0,2,0,0" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
 
-            <Style x:Key="MonitorHardwareText" TargetType="{x:Type TextBox}">
+            <Style x:Key="MonitorHardwareText" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                 <Setter Property="Margin" Value="0,2,0,0" />
                 <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="Width" Value="Auto" />
                 <Setter Property="MinWidth" Value="40" />
                 <Setter Property="VerticalAlignment" Value="Center" />
@@ -598,9 +726,30 @@
             <Style x:Key="HotkeyToggle" TargetType="{x:Type ToggleButton}">
                 <Setter Property="Content" Value="Bind" />
                 <Setter Property="Height" Value="22" />
+                <Setter Property="Foreground" Value="#FFFFFF" />
+                <Setter Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,0" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource ChromeAccentHoverBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource ChromeAccentHoverBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
-            <Style x:Key="HotkeyLabel" TargetType="{x:Type TextBox}">
+            <Style x:Key="HotkeyLabel" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
                 <Setter Property="Height" Value="22" />
                 <Setter Property="Padding" Value="5,0" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />

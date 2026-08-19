@@ -1663,6 +1663,24 @@ namespace SidebarDiagnostics.Framework {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Reset Colors.
+        /// </summary>
+        public static string SettingsResetColors {
+            get {
+                return ResourceManager.GetString("SettingsResetColors", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Restores the background, font and alert colors to the selected theme&apos;s defaults.
+        /// </summary>
+        public static string SettingsResetColorsTooltip {
+            get {
+                return ResourceManager.GetString("SettingsResetColorsTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to High-Contrast Dark.
         /// </summary>
         public static string ThemeHighContrastDark {

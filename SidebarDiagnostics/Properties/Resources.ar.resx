@@ -805,6 +805,14 @@
     <value>اختر مجموعة ألوان جاهزة للشريط الجانبي ونوافذ التطبيق. يمكنك تعديل الألوان يدويًا لاحقًا من تبويب التخصيص.</value>
     <comment>Settings theme tooltip</comment>
   </data>
+  <data name="SettingsResetColors" xml:space="preserve">
+    <value>إعادة تعيين الألوان</value>
+    <comment>Settings reset colors button</comment>
+  </data>
+  <data name="SettingsResetColorsTooltip" xml:space="preserve">
+    <value>يعيد ألوان الخلفية والخط والتنبيه إلى الإعدادات الافتراضية للمظهر المحدد.</value>
+    <comment>Settings reset colors tooltip</comment>
+  </data>
   <data name="ThemeHighContrastDark" xml:space="preserve">
     <value>داكن عالي التباين</value>
     <comment>Theme name</comment>
