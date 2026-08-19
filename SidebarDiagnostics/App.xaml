@@ -7,6 +7,7 @@
              xmlns:frame="clr-namespace:SidebarDiagnostics.Framework"
              xmlns:command="clr-namespace:SidebarDiagnostics.Commands"
              xmlns:conv="clr-namespace:SidebarDiagnostics.Converters"
+             xmlns:ctrl="clr-namespace:SidebarDiagnostics.Controls"
              xmlns:win="clr-namespace:SidebarDiagnostics.Windows"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
@@ -38,6 +39,7 @@
                 </tb:TaskbarIcon.ContextMenu>
             </tb:TaskbarIcon>
 
+            <ctrl:HexToBrushConverter x:Key="HexToBrush" />
             <conv:MetricLabelConverter x:Key="MetricLabelConverter" />
             <conv:FontToSpaceConverter x:Key="FontToSpaceConverter" />
             <conv:BoolInverseConverter x:Key="BoolInverseConverter" />
@@ -388,6 +390,99 @@
 
             <Style TargetType="{x:Type CheckBox}">
                 <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type CheckBox}">
+                            <StackPanel Orientation="Horizontal" Background="Transparent">
+                                <Border x:Name="Box" Width="17" Height="17" CornerRadius="4" SnapsToDevicePixels="True"
+                                        Background="{DynamicResource ChromeSurfaceBrush}"
+                                        BorderBrush="{DynamicResource ChromeBorderBrush}" BorderThickness="1">
+                                    <Path x:Name="Check" Data="M 2,5.5 L 5,8.5 L 10.5,3" Stroke="#FFFFFF" StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                                          Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <ContentPresenter x:Name="Label" Margin="8,0,0,0" VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </StackPanel>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Box" Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
+                                    <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource ChromeAccentBrush}" />
+                                    <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource ChromeAccentBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45" />
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                </Trigger>
+                                <Trigger Property="Content" Value="{x:Null}">
+                                    <Setter TargetName="Label" Property="Margin" Value="0" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type Slider}">
+                <Setter Property="Foreground" Value="{DynamicResource ChromeAccentBrush}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Slider}">
+                            <Grid VerticalAlignment="Center" Background="Transparent">
+                                <Border Height="4" CornerRadius="2" VerticalAlignment="Center"
+                                        Background="{DynamicResource ChromeSurfaceHoverBrush}" />
+                                <Track x:Name="PART_Track">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Command="Slider.DecreaseLarge" Focusable="False">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                    <Border Height="4" CornerRadius="2" VerticalAlignment="Center"
+                                                            Background="{DynamicResource ChromeAccentBrush}" />
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="Slider.IncreaseLarge" Focusable="False">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                    <Border Background="Transparent" />
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Width="14" Height="14" Focusable="False">
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="{x:Type Thumb}">
+                                                    <Ellipse x:Name="Knob" Fill="{DynamicResource ChromeForegroundBrush}"
+                                                             Stroke="{DynamicResource ChromeAccentBrush}" StrokeThickness="1" />
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource ChromeAccentBrush}" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <Style TargetType="{x:Type Label}">
@@ -486,38 +581,10 @@
                 It exposes a ButtonStyle property for exactly this, which restyles the button
                 without replacing the picker template (that would break the palette popup parts).
             -->
-            <Style x:Key="ColorPickerToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Style TargetType="{x:Type TabControl}">
                 <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="Padding" Value="4,2" />
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ToggleButton}">
-                            <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
-                                <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextElement.Foreground="{TemplateBinding Foreground}" />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource ChromeAccentBrush}" />
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style TargetType="{x:Type xctk:ColorPicker}">
-                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
-                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
-                <Setter Property="ButtonStyle" Value="{StaticResource ColorPickerToggleStyle}" />
             </Style>
 
             <Style TargetType="{x:Type xctk:CheckComboBox}">
@@ -561,23 +628,6 @@
                                 <Setter Property="IsSnapToTickEnabled" Value="True" />
                             </Style>
                         </Style.Resources>
-                    </Style>
-                    <Style TargetType="{x:Type xctk:ColorPicker}" BasedOn="{StaticResource {x:Type xctk:ColorPicker}}">
-                        <Setter Property="Margin" Value="0,6" />
-                        <Setter Property="UsingAlphaChannel" Value="False" />
-                        <Setter Property="ColorMode" Value="ColorCanvas" />
-                        <!--
-                            Xceed paints the swatch+hex row on a hardcoded white background from inside
-                            its own template, which left the light-gray hex text unreadable on the dark
-                            theme. Showing the swatch alone (with the hex still available on hover via
-                            DisplayColorTooltip) avoids that without replacing the whole picker template.
-                        -->
-                        <Setter Property="DisplayColorAndName" Value="False" />
-                        <Setter Property="DisplayColorTooltip" Value="True" />
-                        <Setter Property="ShowStandardColors" Value="False" />
-                        <Setter Property="AdvancedButtonHeader" Value="Advanced" />
-                        <Setter Property="AvailableColorsHeader" Value="Colors" />
-                        <Setter Property="StandardButtonHeader" Value="Standard" />
                     </Style>
                 </Style.Resources>
             </Style>
@@ -625,19 +675,38 @@
                 <Setter Property="AlternatingRowBackground" Value="{DynamicResource ChromeBackgroundBrush}" />
                 <Setter Property="RowHeaderWidth" Value="0" />
                 <Style.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#3A6EA5" />
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFF" />
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#3A6EA5" />
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF" />
+                    <!--
+                        Selecting a row here just expands its detail panel, so a full-bleed accent
+                        fill was far louder than the action warranted. A raised surface reads as
+                        "this row is open" without shouting over the panel it reveals.
+                    -->
                     <Style TargetType="{x:Type DataGridCell}">
                         <Setter Property="BorderThickness" Value="0" />
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                         <Setter Property="Padding" Value="0" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                    <Border Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                        <ContentPresenter VerticalAlignment="Center" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                        <Setter Property="Cursor" Value="Hand" />
                         <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource ChromeSurfaceBrush}" />
+                            </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
-                                <Setter Property="Foreground" Value="#FFFFFF" />
+                                <Setter Property="Background" Value="{DynamicResource ChromeSurfaceHoverBrush}" />
+                                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -723,25 +792,35 @@
                 <Setter Property="Margin" Value="10" />
             </Style>
 
+            <!--
+                Bind sits idle most of the time, so it reads as a quiet secondary button and only
+                lights up in the accent colour while it is actually listening for a key press.
+            -->
             <Style x:Key="HotkeyToggle" TargetType="{x:Type ToggleButton}">
                 <Setter Property="Content" Value="Bind" />
-                <Setter Property="Height" Value="22" />
-                <Setter Property="Foreground" Value="#FFFFFF" />
-                <Setter Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
-                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Height" Value="24" />
+                <Setter Property="MinWidth" Value="56" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource ChromeSurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ToggleButton}">
-                            <Border Background="{TemplateBinding Background}" CornerRadius="3">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,0" />
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0" />
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource ChromeAccentHoverBrush}" />
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ChromeSurfaceHoverBrush}" />
                                 </Trigger>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource ChromeAccentHoverBrush}" />
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
+                                    <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource ChromeAccentBrush}" />
+                                    <Setter Property="Foreground" Value="#FFFFFF" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

@@ -5,55 +5,61 @@
         x:Class="SidebarDiagnostics.Style.FlatStyle"
         x:ClassModifier="public">
     
-    <Style x:Key="FlatButton" TargetType="{x:Type Button}">
-        <Setter Property="Width" Value="16" />
-        <Setter Property="Height" Value="16" />
-        <Setter Property="Margin" Value="0,0,6,0" />
+    <!--
+        Window caption controls. Modelled on the Windows 11 title bar: flat, borderless,
+        icon-only, with the hover state carried by a subtle background fill (red for close)
+        rather than the coloured "traffic light" circles this used to draw.
+    -->
+    <Style x:Key="WindowControlButton" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Margin" Value="0" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="#FFFFFF" />
-        <Setter Property="Background" Value="#BDC3C7" />
+        <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="4">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ChromeSurfaceHoverBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Style.Resources>
             <Style TargetType="{x:Type Path}">
-                <Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
-                <Setter Property="Stretch" Value="Uniform" />
-                <Setter Property="Width" Value="8" />
-                <Setter Property="Height" Value="8" />
+                <Setter Property="Stroke" Value="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}" />
+                <Setter Property="StrokeThickness" Value="1.1" />
+                <Setter Property="StrokeStartLineCap" Value="Square" />
+                <Setter Property="StrokeEndLineCap" Value="Square" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
             </Style>
         </Style.Resources>
     </Style>
 
-    <Style x:Key="FlatButtonGreen" TargetType="{x:Type Button}" BasedOn="{StaticResource FlatButton}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#2ECC71" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="FlatButtonYellow" TargetType="{x:Type Button}" BasedOn="{StaticResource FlatButton}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#F1C40F" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="FlatButtonRed" TargetType="{x:Type Button}" BasedOn="{StaticResource FlatButton}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#E74C3C" />
-            </Trigger>
-        </Style.Triggers>
+    <Style x:Key="WindowCloseButton" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowControlButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ChromeDangerBrush}" />
+                            <Setter Property="Foreground" Value="#FFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="DragThumb" TargetType="{x:Type Thumb}">
@@ -94,16 +100,16 @@
 
                                         <TextBlock x:Name="PART_TITLE" DockPanel.Dock="Left" Text="{TemplateBinding Title}" Margin="8,0,0,1" Padding="0" VerticalAlignment="Center" Foreground="{DynamicResource ChromeForegroundBrush}" FontSize="12" />
 
-                                        <Button x:Name="PART_CLOSE" DockPanel.Dock="Right" Click="PART_CLOSE_Click" Style="{StaticResource FlatButtonRed}">
-                                            <Path Data="M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z" />
+                                        <Button x:Name="PART_CLOSE" DockPanel.Dock="Right" Margin="2,0,6,0" Click="PART_CLOSE_Click" Style="{StaticResource WindowCloseButton}">
+                                            <Path Data="M 0,0 L 9,9 M 9,0 L 0,9" />
                                         </Button>
 
-                                        <Button x:Name="PART_MAXIMIZE_RESTORE" DockPanel.Dock="Right" Click="PART_MAXIMIZE_RESTORE_Click" Style="{StaticResource FlatButtonGreen}">
-                                            <Path Data="M 44.3333,19L 57,19L 57,31.6667L 52.25,36.4167L 52.25,27.7083L 34.8333,45.125L 30.875,41.1667L 48.2917,23.75L 39.5833,23.75L 44.3333,19 Z M 19,25.3333L 42.75,25.3333L 38,30.0833L 23.75,30.0833L 23.75,52.25L 45.9167,52.25L 45.9167,38L 50.6667,33.25L 50.6667,57L 19,57L 19,25.3333 Z" />
+                                        <Button x:Name="PART_MAXIMIZE_RESTORE" DockPanel.Dock="Right" Click="PART_MAXIMIZE_RESTORE_Click" Style="{StaticResource WindowControlButton}">
+                                            <Path Data="M 0.5,0.5 L 9.5,0.5 L 9.5,9.5 L 0.5,9.5 Z" />
                                         </Button>
 
-                                        <Button x:Name="PART_MINIMIZE" DockPanel.Dock="Right" Click="PART_MINIMIZE_Click" Style="{StaticResource FlatButtonYellow}">
-                                            <Path Data="M 19,38L 57,38L 57,44L 19,44L 19,38 Z" />
+                                        <Button x:Name="PART_MINIMIZE" DockPanel.Dock="Right" Click="PART_MINIMIZE_Click" Style="{StaticResource WindowControlButton}">
+                                            <Path Data="M 0,5 L 10,5" />
                                         </Button>
                                     </DockPanel>
                                 </Border>
@@ -153,83 +159,154 @@
         </Setter>
     </Style>
     
+    <!--
+        Dialog buttons follow one hierarchy so each dialog reads at a glance:
+          WindowButton    - primary, accent filled (the one action the dialog is for)
+          SecondaryButton - raised surface + border (supporting action, e.g. Apply)
+          NeutralButton   - ghost, transparent until hovered (dismiss / reset)
+        All three share geometry, so they line up cleanly next to each other.
+    -->
     <Style x:Key="WindowButton" TargetType="{x:Type Button}">
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="FontWeight" Value="500" />
-        <Setter Property="Margin" Value="10,0,0,0" />
-        <Setter Property="Padding" Value="20,8" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="8,0,0,0" />
+        <Setter Property="MinWidth" Value="84" />
+        <Setter Property="Padding" Value="18,8" />
         <Setter Property="Foreground" Value="#FFFFFF" />
         <Setter Property="Background" Value="{DynamicResource ChromeAccentBrush}" />
         <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" CornerRadius="5" SnapsToDevicePixels="True">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ChromeAccentHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Background" Value="Transparent" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
-                <Setter Property="Background" Value="{DynamicResource ChromeBackgroundBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource ChromeMutedBrush}" />
-                <Setter Property="BorderThickness" Value="1" />
-            </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource ChromeAccentHoverBrush}" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <Style x:Key="WindowButton_SM" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton}">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinWidth" Value="76" />
+        <Setter Property="Padding" Value="14,7" />
     </Style>
 
-    <Style x:Key="SuccessButton" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton}">
-        <Setter Property="Background" Value="#2ECC71" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#27AE60" />
-            </Trigger>
-        </Style.Triggers>
+    <Style x:Key="SecondaryButton" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton}">
+        <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource ChromeSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" CornerRadius="5" SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ChromeSurfaceHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
-    <Style x:Key="SuccessButton_SM" TargetType="{x:Type Button}" BasedOn="{StaticResource SuccessButton}">
+    <Style x:Key="SecondaryButton_SM" TargetType="{x:Type Button}" BasedOn="{StaticResource SecondaryButton}">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinWidth" Value="76" />
+        <Setter Property="Padding" Value="14,7" />
     </Style>
+
+    <Style x:Key="SuccessButton" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton}" />
+
+    <Style x:Key="SuccessButton_SM" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton_SM}" />
 
     <Style x:Key="ErrorButton" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton}">
-        <Setter Property="Background" Value="#E74C3C" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#C0392B" />
-            </Trigger>
-        </Style.Triggers>
+        <Setter Property="Background" Value="{DynamicResource ChromeDangerBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" CornerRadius="5" SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.85" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="ErrorButton_SM" TargetType="{x:Type Button}" BasedOn="{StaticResource ErrorButton}">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinWidth" Value="76" />
+        <Setter Property="Padding" Value="14,7" />
     </Style>
 
     <Style x:Key="NeutralButton" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton}">
-        <Setter Property="Background" Value="#95A5A6" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#7F8C8D" />
-            </Trigger>
-        </Style.Triggers>
+        <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ChromeBorderBrush}" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" CornerRadius="5" SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ChromeSurfaceHoverBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource ChromeMutedBrush}" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="NeutralButton_SM" TargetType="{x:Type Button}" BasedOn="{StaticResource NeutralButton}">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinWidth" Value="76" />
+        <Setter Property="Padding" Value="14,7" />
     </Style>
 
     <Style x:Key="WindowButtons" TargetType="{x:Type StackPanel}">
@@ -238,14 +315,14 @@
         <Setter Property="Orientation" Value="Horizontal" />
         <Setter Property="Margin" Value="20" />
         <Style.Resources>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton}" />
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SecondaryButton}" />
         </Style.Resources>
     </Style>
-    
+
     <Style x:Key="WindowButtons_SM" TargetType="{x:Type StackPanel}" BasedOn="{StaticResource WindowButtons}">
         <Setter Property="Margin" Value="15" />
         <Style.Resources>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButton_SM}" />
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SecondaryButton_SM}" />
         </Style.Resources>
     </Style>
 </ResourceDictionary>

@@ -11,6 +11,7 @@
         xmlns:conv="clr-namespace:SidebarDiagnostics.Converters"
         xmlns:win="clr-namespace:SidebarDiagnostics.Windows"
         xmlns:sty="clr-namespace:SidebarDiagnostics.Style"
+        xmlns:ctrl="clr-namespace:SidebarDiagnostics.Controls"
         xmlns:frame="clr-namespace:SidebarDiagnostics.Framework"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
@@ -29,7 +30,7 @@
     </Window.Resources>
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom" Style="{StaticResource WindowButtons_SM}">
-            <Button Content="{x:Static frame:Resources.ButtonSave}" Click="SaveButton_Click" />
+            <Button Content="{x:Static frame:Resources.ButtonSave}" Click="SaveButton_Click" Style="{StaticResource WindowButton_SM}" />
             <Button Content="{x:Static frame:Resources.ButtonApply}" IsEnabled="{Binding Path=IsChanged, Mode=OneWay}" Click="ApplyButton_Click" />
             <Button Click="CloseButton_Click">
                 <Button.Style>
@@ -178,7 +179,7 @@
                     <CheckBox Grid.Column="1" Grid.Row="1" IsChecked="{Binding Path=AutoBGColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsAutoBackgroundTooltip}" />
 
                     <Label Grid.Column="0" Grid.Row="2" Content="{x:Static frame:Resources.SettingsBackgroundColor}" />
-                    <xctk:ColorPicker Grid.Column="1" Grid.Row="2" IsEnabled="{Binding Path=AutoBGColor, Mode=OneWay, Converter={StaticResource BoolInverseConverter}}" SelectedColor="{Binding Path=BGColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsBackgroundColorTooltip}" />
+                    <ctrl:ColorPickerBox Grid.Column="1" Grid.Row="2" Margin="0,6" IsEnabled="{Binding Path=AutoBGColor, Mode=OneWay, Converter={StaticResource BoolInverseConverter}}" SelectedColor="{Binding Path=BGColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsBackgroundColorTooltip}" />
 
                     <Label Grid.Column="0" Grid.Row="3" Content="{x:Static frame:Resources.SettingsBackgroundOpacity}" />
                     <DockPanel Grid.Column="1" Grid.Row="3">
@@ -193,10 +194,10 @@
                     <ComboBox Grid.Column="1" Grid.Row="5" ItemsSource="{Binding Path=FontSettingItems, Mode=OneWay}" DisplayMemberPath="FontSize" SelectedValue="{Binding Path=FontSetting, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsFontSizeTooltip}" />
 
                     <Label Grid.Column="0" Grid.Row="6" Content="{x:Static frame:Resources.SettingsFontColor}" />
-                    <xctk:ColorPicker Grid.Column="1" Grid.Row="6" SelectedColor="{Binding Path=FontColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsFontColorTooltip}"/>
+                    <ctrl:ColorPickerBox Grid.Column="1" Grid.Row="6" Margin="0,6" SelectedColor="{Binding Path=FontColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsFontColorTooltip}"/>
 
                     <Label Grid.Column="0" Grid.Row="7" Content="{x:Static frame:Resources.SettingsAlertFontColor}" />
-                    <xctk:ColorPicker Grid.Column="1" Grid.Row="7" SelectedColor="{Binding Path=AlertFontColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsAlertFontColorTooltip}"/>
+                    <ctrl:ColorPickerBox Grid.Column="1" Grid.Row="7" Margin="0,6" SelectedColor="{Binding Path=AlertFontColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsAlertFontColorTooltip}"/>
 
                     <Label Grid.Column="0" Grid.Row="8" Content="{x:Static frame:Resources.SettingsAlertBlink}" />
                     <CheckBox Grid.Column="1" Grid.Row="8" IsChecked="{Binding Path=AlertBlink, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsAlertBlinkTooltip}" />

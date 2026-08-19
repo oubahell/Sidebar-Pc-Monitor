@@ -282,6 +282,9 @@
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utilities.cs" />
+    <Compile Include="Controls\ColorPickerBox.xaml.cs">
+      <DependentUpon>ColorPickerBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FlatStyle.xaml.cs">
       <DependentUpon>FlatStyle.xaml</DependentUpon>
     </Compile>
@@ -318,6 +321,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FlatStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ColorPickerBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

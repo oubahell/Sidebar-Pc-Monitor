@@ -34,8 +34,8 @@
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" Style="{StaticResource WindowButtons}">
                 <Button Content="{x:Static frame:Resources.ButtonYes}" Click="Yes_Click" Style="{StaticResource SuccessButton}" />
-                <Button Content="{x:Static frame:Resources.ButtonNo}" Click="No_Click" Style="{StaticResource ErrorButton}" />
-                <Button Content="{x:Static frame:Resources.ButtonSkip}" Click="Close_Click" />
+                <Button Content="{x:Static frame:Resources.ButtonNo}" Click="No_Click" Style="{StaticResource SecondaryButton}" />
+                <Button Content="{x:Static frame:Resources.ButtonSkip}" Click="Close_Click" Style="{StaticResource NeutralButton}" />
             </StackPanel>
             <StackPanel Style="{StaticResource SetupContent}">
                 <TextBlock Text="{x:Static frame:Resources.SetupText}" Style="{StaticResource SetupText}" />

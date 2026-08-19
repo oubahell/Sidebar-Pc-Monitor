@@ -9,7 +9,21 @@
     <SolidColorBrush x:Key="ChromeBorderBrush" Color="#3A3F4B" />
     <SolidColorBrush x:Key="ChromeAccentBrush" Color="#3498DB" />
     <SolidColorBrush x:Key="ChromeAccentHoverBrush" Color="#2980B9" />
-    <SolidColorBrush x:Key="ChromeMutedBrush" Color="#888888" />
+    <SolidColorBrush x:Key="ChromeMutedBrush" Color="#8A8F9A" />
+    <!-- Slightly raised surface used for secondary buttons, inputs and hover states. -->
+    <SolidColorBrush x:Key="ChromeSurfaceBrush" Color="#1C1F27" />
+    <SolidColorBrush x:Key="ChromeSurfaceHoverBrush" Color="#262A34" />
+    <SolidColorBrush x:Key="ChromeDangerBrush" Color="#E81123" />
     <Color x:Key="ChromeShadowColor">#000000</Color>
+
+    <!-- Third-party drop-downs (the Xceed pickers) paint themselves from the system palette
+         rather than our brushes, so their popups render stock white unless it is overridden. -->
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#12141A" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#1C1F27" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#3498DB" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="{x:Static SystemColors.GrayTextBrushKey}" Color="#8A8F9A" />
 
 </ResourceDictionary>
