@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,6 +31,16 @@ namespace SidebarDiagnostics
             }
 
             Ready = false;
+
+            // A reload throws this sidebar away and builds a new one. Any settings window open at
+            // the time is bound to a SettingsModel holding *this* instance, so it would carry on
+            // sitting there looking normal while every control in it pointed at a sidebar that no
+            // longer exists - saving from it would apply to nothing. Close them; the tray icon
+            // opens a fresh one against the new sidebar.
+            foreach (Settings _settings in App.Current.Windows.OfType<Settings>().ToArray())
+            {
+                _settings.Close();
+            }
 
             App._reloading = true;
 

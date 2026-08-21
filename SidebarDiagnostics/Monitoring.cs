@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -2201,8 +2201,14 @@ namespace SidebarDiagnostics.Monitoring
                 case MetricPreset.Gamer:
                     return new MetricKey[]
                     {
-                        MetricKey.CPUClock, MetricKey.CPUTemp, MetricKey.CPUVoltage, MetricKey.CPUPower,
-                        MetricKey.CPUCurrent, MetricKey.CPUFan, MetricKey.CPULoad, MetricKey.CPUCoreMax,
+                        // No CPU voltage, package power or current here. Voltage and power swing
+                        // hard from moment to moment at idle, which reads as noise rather than
+                        // information, and neither tells a gamer anything temperature and load do
+                        // not. Current goes with them because it is derived from package power -
+                        // amps on screen with no watts beside them looks like something is broken.
+                        // All three stay one tick away in Advanced or Custom.
+                        MetricKey.CPUClock, MetricKey.CPUTemp,
+                        MetricKey.CPUFan, MetricKey.CPULoad, MetricKey.CPUCoreMax,
                         MetricKey.RAMClock, MetricKey.RAMLoad, MetricKey.RAMUsed, MetricKey.RAMFree,
                         MetricKey.GPUCoreClock, MetricKey.GPUVRAMClock, MetricKey.GPUCoreLoad,
                         MetricKey.GPUVRAMLoad, MetricKey.GPUVoltage, MetricKey.GPUPower,

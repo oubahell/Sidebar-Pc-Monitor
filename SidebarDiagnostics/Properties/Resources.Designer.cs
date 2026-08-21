@@ -2482,6 +2482,24 @@ namespace SidebarDiagnostics.Framework {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version {0} is available. Click here to update.
+        /// </summary>
+        public static string UpdateAvailableText {
+            get {
+                return ResourceManager.GetString("UpdateAvailableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is the portable version - there is nothing to uninstall. Just delete this folder.
+        /// </summary>
+        public static string UninstallPortableText {
+            get {
+                return ResourceManager.GetString("UninstallPortableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Initial Setup.
         /// </summary>
         public static string SetupTitle {

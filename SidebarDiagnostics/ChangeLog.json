@@ -1,5 +1,15 @@
 ﻿[
 	{
+		"Version": "4.0.10",
+		"Changes": [
+			"There is now an uninstall.exe in the app folder, for anyone who looks there instead of Add or Remove Programs.",
+			"The app checks for a new version each time it starts and tells you in a tray notification. Nothing installs itself - you click to update.",
+			"Double-click the tray icon to open Settings.",
+			"Reloading no longer leaves a dead Settings window behind.",
+			"CPU voltage, power and current are off by default - they read as noise at idle. Turn them on in Advanced or Custom."
+		]
+	},
+	{
 		"Version": "4.0.9",
 		"Changes": [
 			"Uninstalling now removes the start-at-logon task. Third time lucky - the previous two fixes both still missed it."

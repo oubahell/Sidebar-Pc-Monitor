@@ -1232,4 +1232,12 @@ You can install it manually from https://pawnio.eu and restart the app.</value>
     <value>Shows the name of the computer.</value>
     <comment>Settings show machine name tooltip</comment>
   </data>
+  <data name="UpdateAvailableText" xml:space="preserve">
+    <value>Version {0} is available. Click here to update.</value>
+    <comment>Tray balloon shown when a newer version is found</comment>
+  </data>
+  <data name="UninstallPortableText" xml:space="preserve">
+    <value>This is the portable version - there is nothing to uninstall. Just delete this folder.</value>
+    <comment>Shown when uninstall.exe is run from the portable build</comment>
+  </data>
 </root>

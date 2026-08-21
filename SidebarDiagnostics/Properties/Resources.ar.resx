@@ -1233,4 +1233,12 @@
     <value>إظهار إسم الحاسوب.</value>
     <comment>Settings show machine name tooltip</comment>
   </data>
+  <data name="UpdateAvailableText" xml:space="preserve">
+    <value>الإصدار {0} متاح. انقر هنا للتحديث.</value>
+    <comment>Tray balloon shown when a newer version is found</comment>
+  </data>
+  <data name="UninstallPortableText" xml:space="preserve">
+    <value>هذه النسخة المحمولة - لا يوجد شيء لإلغاء تثبيته. فقط احذف هذا المجلد.</value>
+    <comment>Shown when uninstall.exe is run from the portable build</comment>
+  </data>
 </root>

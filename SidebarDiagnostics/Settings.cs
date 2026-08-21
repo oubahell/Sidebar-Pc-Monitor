@@ -316,7 +316,10 @@ namespace SidebarDiagnostics.Framework
             }
         }
 
-        private bool _autoUpdate { get; set; } = false;
+        // On by default. It only looks and then says so in a tray balloon - nothing installs
+        // itself - so the cost of leaving it on is one background request per launch, and the cost
+        // of leaving it off is people running an old build without knowing there is a newer one.
+        private bool _autoUpdate { get; set; } = true;
 
         [JsonProperty]
         public bool AutoUpdate

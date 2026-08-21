@@ -18,8 +18,12 @@
             </ResourceDictionary.MergedDictionaries>
 
             <command:ActivateCommand x:Key="ShowCommand" />
+            <command:SettingsCommand x:Key="TraySettingsCommand" />
 
-            <tb:TaskbarIcon x:Key="TrayIcon" IconSource="Sidebar.ico" LeftClickCommand="{StaticResource ShowCommand}">
+            <tb:TaskbarIcon x:Key="TrayIcon" IconSource="Sidebar.ico"
+                            LeftClickCommand="{StaticResource ShowCommand}"
+                            DoubleClickCommand="{StaticResource TraySettingsCommand}"
+                            NoLeftClickDelay="False">
                 <tb:TaskbarIcon.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{x:Static frame:Resources.ButtonSettings}" Click="Settings_Click" />

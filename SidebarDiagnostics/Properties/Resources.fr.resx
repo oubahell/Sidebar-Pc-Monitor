@@ -1049,4 +1049,8 @@
     <value>Choisissez votre langue</value>
     <comment>Title of the first run language picker</comment>
   </data>
+  <data name="UpdateAvailableText" xml:space="preserve">
+    <value>La version {0} est disponible. Cliquez ici pour mettre à jour.</value>
+    <comment>Tray balloon shown when a newer version is found</comment>
+  </data>
 </root>

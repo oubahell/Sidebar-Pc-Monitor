@@ -38,10 +38,89 @@ namespace SidebarDiagnostics
             // what builds App.xaml's resources, which include the whole theme and a live tray
             // icon. Doing that during an install hook is wasted work at best, and a throwing
             // resource would leave the install half-finished. OnStartup is later still.
+            // Before anything else, including the updater hooks: this same binary also ships as
+            // uninstall.exe, and in that guise it has one job and must not start an app.
+            RunAsUninstallerIfNamedSo();
+
             VelopackApp.Build()
                 .OnBeforeUninstallFastCallback(_v => CleanUp())
                 .Run();
         }
+
+        /// <summary>
+        /// When this executable is called uninstall.exe, hand over to the real uninstaller and exit.
+        /// </summary>
+        /// <remarks>
+        /// The installer registers itself in Add/Remove Programs and that is the supported route,
+        /// but people open the install folder and look for an uninstaller, and finding none reads
+        /// as an app that does not want to be removed. Velopack does not produce one, so we ship a
+        /// copy of this exe named uninstall.exe alongside it - the copy already sits next to every
+        /// DLL it needs, which a purpose-built stub in the root folder would not.
+        ///
+        /// It does not uninstall anything itself. It starts Update.exe, which owns that job and
+        /// runs the cleanup hook on the way through, and gets out of the way immediately: deleting
+        /// this very folder while this process is holding its own exe open would not end well.
+        /// </remarks>
+        private static void RunAsUninstallerIfNamedSo()
+        {
+            string _exe = Process.GetCurrentProcess().MainModule.FileName;
+
+            if (!string.Equals(Path.GetFileNameWithoutExtension(_exe), UNINSTALL_NAME, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            // An installed copy lives in "current" with Update.exe one level up in the install
+            // root. The parent is only considered when this folder really is called "current":
+            // reaching up to any parent that happens to hold a file by that name found a stale
+            // Update.exe from an unrelated install during testing and ran it.
+            string _dir = Path.GetDirectoryName(_exe);
+            string _updater = Path.Combine(_dir, UPDATER_NAME);
+
+            if (!File.Exists(_updater) && string.Equals(Path.GetFileName(_dir), CURRENT_DIR, StringComparison.OrdinalIgnoreCase))
+            {
+                DirectoryInfo _parent = Directory.GetParent(_dir);
+
+                _updater = _parent == null ? null : Path.Combine(_parent.FullName, UPDATER_NAME);
+            }
+
+            if (_updater == null || !File.Exists(_updater))
+            {
+                // The portable build has no updater, and nothing to uninstall - it is a folder.
+                MessageBox.Show(
+                    Framework.Resources.UninstallPortableText,
+                    Framework.Resources.AppName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information,
+                    MessageBoxResult.OK,
+                    MessageBoxOptions.DefaultDesktopOnly);
+
+                Environment.Exit(0);
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = _updater,
+                    Arguments = "--uninstall",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception)
+            {
+                // Nothing useful to offer if the updater will not start; Add/Remove Programs runs
+                // the same command and is still there.
+            }
+
+            Environment.Exit(0);
+        }
+
+        private const string UNINSTALL_NAME = "uninstall";
+
+        private const string UPDATER_NAME = "Update.exe";
+
+        private const string CURRENT_DIR = "current";
 
         /// <summary>
         /// Relaunches the app elevated and ends this process, unless it is elevated already.
@@ -278,14 +357,6 @@ namespace SidebarDiagnostics
 
             Culture.SetCurrent(true);
 
-            // UPDATE
-            #if !DEBUG
-            if (Framework.Settings.Instance.AutoUpdate)
-            {
-                await AppUpdate(false);
-            }
-            #endif
-
             // SETTINGS
             CheckSettings();
 
@@ -308,6 +379,19 @@ namespace SidebarDiagnostics
             TrayIcon = (TaskbarIcon)FindResource("TrayIcon");
             TrayIcon.ToolTipText = string.Format("{0} v{1}", Framework.Resources.AppName, _vstring);
             TrayIcon.TrayContextMenuOpen += TrayIcon_TrayContextMenuOpen;
+
+            // UPDATE
+            //
+            // Deliberately not awaited: a launch should not wait on a network round trip, and the
+            // old behaviour - download and relaunch silently, before the sidebar had even appeared
+            // - meant the app could vanish and come back while you were still looking for it.
+            // NotifyUpdate only looks, and tells you.
+            #if !DEBUG
+            if (Framework.Settings.Instance.AutoUpdate)
+            {
+                NotifyUpdate();
+            }
+            #endif
 
             // START APP
             if (Framework.Settings.Instance.InitialSetup)
@@ -491,6 +575,101 @@ namespace SidebarDiagnostics
         /// Updates only work for an installed build. Running loose from a build output folder there
         /// is nothing for the updater to replace, so it reports "up to date" rather than failing.
         /// </summary>
+        /// <summary>
+        /// Looks for a newer release and, if there is one, says so in a tray balloon. Clicking the
+        /// balloon installs it.
+        /// </summary>
+        /// <remarks>
+        /// Runs on every launch. It deliberately does not install anything on its own: an update
+        /// that downloads and relaunches the app unasked is the kind of helpfulness that loses
+        /// someone's arrangement of windows mid-session. Looking is free; deciding is the user's.
+        ///
+        /// Failures are silent by design. Nobody wants an error box on every launch because their
+        /// connection is down, and the same failure surfaces properly through the tray menu's
+        /// check, which the user asked for and is waiting on.
+        /// </remarks>
+        private async void NotifyUpdate()
+        {
+            string _feed = ConfigurationManager.AppSettings["CurrentReleaseURL"];
+
+            if (string.IsNullOrWhiteSpace(_feed))
+            {
+                return;
+            }
+
+            try
+            {
+                UpdateManager _manager = new UpdateManager(new GithubSource(_feed, null, false));
+
+                if (!_manager.IsInstalled)
+                {
+                    // Running from the portable build or straight out of a build folder. There is
+                    // nothing for the updater to replace.
+                    return;
+                }
+
+                UpdateInfo _update = await _manager.CheckForUpdatesAsync();
+
+                if (_update == null || TrayIcon == null)
+                {
+                    return;
+                }
+
+                _pendingManager = _manager;
+                _pendingUpdate = _update;
+
+                TrayIcon.TrayBalloonTipClicked -= UpdateBalloon_Clicked;
+                TrayIcon.TrayBalloonTipClicked += UpdateBalloon_Clicked;
+
+                TrayIcon.ShowBalloonTip(
+                    Framework.Resources.AppName,
+                    string.Format(Framework.Resources.UpdateAvailableText, _update.TargetFullRelease.Version),
+                    BalloonIcon.Info);
+            }
+            catch (Exception)
+            {
+                // See the remarks: a launch-time check stays quiet about its own failures.
+            }
+        }
+
+        private static async void UpdateBalloon_Clicked(object sender, RoutedEventArgs e)
+        {
+            UpdateManager _manager = _pendingManager;
+            UpdateInfo _update = _pendingUpdate;
+
+            if (_manager == null || _update == null)
+            {
+                return;
+            }
+
+            // Cleared first: a second click while the download is running would start it twice.
+            _pendingManager = null;
+            _pendingUpdate = null;
+
+            Update _updateWindow = new Update();
+            _updateWindow.Show();
+
+            try
+            {
+                await _manager.DownloadUpdatesAsync(_update, p => _updateWindow.SetProgress(p));
+
+                _updateWindow.Close();
+
+                // Hands over to the updater, which swaps the files and relaunches.
+                _manager.ApplyUpdatesAndRestart(_update);
+            }
+            catch (Exception)
+            {
+                _updateWindow.Close();
+
+                MessageBox.Show(Framework.Resources.UpdateErrorText, Framework.Resources.UpdateErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+            }
+        }
+
+        private static UpdateManager _pendingManager { get; set; }
+
+        private static UpdateInfo _pendingUpdate { get; set; }
+
         private async Task AppUpdate(bool showInfo)
         {
             string _feed = ConfigurationManager.AppSettings["CurrentReleaseURL"];

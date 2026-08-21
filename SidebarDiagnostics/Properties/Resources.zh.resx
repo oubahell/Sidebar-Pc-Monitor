@@ -1052,4 +1052,8 @@
     <value>选择您的语言</value>
     <comment>Title of the first run language picker</comment>
   </data>
+  <data name="UpdateAvailableText" xml:space="preserve">
+    <value>版本 {0} 可用。点击此处更新。</value>
+    <comment>Tray balloon shown when a newer version is found</comment>
+  </data>
 </root>

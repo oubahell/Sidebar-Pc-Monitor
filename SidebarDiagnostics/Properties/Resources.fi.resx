@@ -1053,4 +1053,8 @@
     <value>Valitse kielesi</value>
     <comment>Title of the first run language picker</comment>
   </data>
+  <data name="UpdateAvailableText" xml:space="preserve">
+    <value>Versio {0} on saatavilla. Päivitä napsauttamalla tästä.</value>
+    <comment>Tray balloon shown when a newer version is found</comment>
+  </data>
 </root>
