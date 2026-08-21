@@ -1,5 +1,11 @@
 ﻿[
 	{
+		"Version": "4.0.8",
+		"Changes": [
+			"Uninstalling now removes the start-at-logon task for real - the previous attempt still missed it."
+		]
+	},
+	{
 		"Version": "4.0.7",
 		"Changes": [
 			"Uninstalling now closes the app if it is running, instead of leaving it open.",

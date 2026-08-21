@@ -131,6 +131,16 @@ namespace SidebarDiagnostics
         /// </remarks>
         private static void CleanUp()
         {
+            // Read before the settings file is deleted below - it is the most reliable signal we
+            // have that a logon task was ever created.
+            bool _startsAtLogon = false;
+
+            try
+            {
+                _startsAtLogon = Framework.Settings.Instance.RunAtStartup;
+            }
+            catch { }
+
             // Steps that need no extra rights come first, so they still happen even if the
             // elevated step below is refused.
             try
@@ -171,14 +181,16 @@ namespace SidebarDiagnostics
 
             // Registered at Highest run level by an elevated process, so removing it takes the
             // same rights. Left alone it survives as a logon task pointing at an exe that is gone.
-            try
+            //
+            // Asked for unconditionally whenever we are elevating anyway. Gating this on the
+            // scheduler library reporting the task exists is what let one survive a real uninstall:
+            // the probe came back empty inside the hook even though the task was plainly there, so
+            // the step was never queued. schtasks on a task that is absent just says so and the
+            // batch carries on, which is a far better trade than missing one that is present.
+            if (_steps.Count > 0 || _startsAtLogon)
             {
-                if (Utilities.Startup.StartupTaskRegistered())
-                {
-                    _steps.Add(string.Format("schtasks /delete /tn \"{0}\" /f", Constants.Generic.TASKNAME));
-                }
+                _steps.Add(string.Format("schtasks /delete /tn \"{0}\" /f", Constants.Generic.TASKNAME));
             }
-            catch { }
 
             if (_steps.Count == 0)
             {
