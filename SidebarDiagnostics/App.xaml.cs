@@ -37,7 +37,51 @@ namespace SidebarDiagnostics
             // what builds App.xaml's resources, which include the whole theme and a live tray
             // icon. Doing that during an install hook is wasted work at best, and a throwing
             // resource would leave the install half-finished. OnStartup is later still.
-            VelopackApp.Build().Run();
+            VelopackApp.Build()
+                .OnBeforeUninstallFastCallback(_v => CleanUp())
+                .Run();
+        }
+
+        /// <summary>
+        /// Removes everything the app leaves outside its own folder, on uninstall.
+        /// </summary>
+        /// <remarks>
+        /// The installer deletes the install directory and its own registry entry, and nothing
+        /// else. Two things live outside it: the "SidebarStartup" scheduled task, which would
+        /// otherwise survive as a logon task pointing at an exe that no longer exists, and the
+        /// Application event log source the startup-task error path registers under HKLM.
+        ///
+        /// Settings live inside the install directory, so the installer already takes them - the
+        /// delete here is for the case where that stops being true.
+        ///
+        /// Every step swallows its own failure. A leftover file is a much smaller problem than an
+        /// uninstall that dies partway and leaves the app half-removed and unlaunchable.
+        /// </remarks>
+        private static void CleanUp()
+        {
+            try
+            {
+                Utilities.Startup.DisableStartupTask();
+            }
+            catch { }
+
+            try
+            {
+                if (EventLog.SourceExists(Framework.Resources.AppName))
+                {
+                    EventLog.DeleteEventSource(Framework.Resources.AppName);
+                }
+            }
+            catch { }
+
+            try
+            {
+                if (File.Exists(Utilities.Paths.SettingsFile))
+                {
+                    File.Delete(Utilities.Paths.SettingsFile);
+                }
+            }
+            catch { }
         }
 
         protected async override void OnStartup(StartupEventArgs e)

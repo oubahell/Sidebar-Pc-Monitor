@@ -1,5 +1,11 @@
 ﻿[
 	{
+		"Version": "4.0.4",
+		"Changes": [
+			"Uninstalling now removes the start-at-logon task and the settings file, instead of leaving them behind."
+		]
+	},
+	{
 		"Version": "4.0.3",
 		"Changes": [
 			"You now pick your language the first time the app runs, instead of hunting for it in Settings.",
