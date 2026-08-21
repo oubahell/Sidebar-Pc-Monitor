@@ -21,6 +21,7 @@
         Icon="Settings.ico"
         Width="460"
         SizeToContent="Height"
+        MaxHeight="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Height}"
         ShowMaximize="False"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource FlatWindowStyle}">

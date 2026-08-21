@@ -303,7 +303,13 @@
                             <DockPanel>
                                 <TabPanel DockPanel.Dock="Top" IsItemsHost="True" Background="Transparent" />
                                 <Border Background="{DynamicResource ChromeBackgroundBrush}" BorderBrush="{DynamicResource ChromeBorderBrush}" BorderThickness="1" CornerRadius="0,4,4,4" Padding="{TemplateBinding Padding}">
-                                    <ContentPresenter ContentSource="SelectedContent" />
+                                    <!-- Tab content scrolls. Expanding a monitor row adds a row per
+                                         piece of hardware, and a machine with ten drives pushed the
+                                         window taller than the screen, putting the buttons out of
+                                         reach below the bottom edge. -->
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,4,0">
+                                        <ContentPresenter ContentSource="SelectedContent" />
+                                    </ScrollViewer>
                                 </Border>
                             </DockPanel>
                         </ControlTemplate>

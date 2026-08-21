@@ -1,5 +1,12 @@
 ﻿[
 	{
+		"Version": "4.0.11",
+		"Changes": [
+			"The settings window no longer grows past the bottom of the screen when you expand a monitor with a lot of hardware - it scrolls instead.",
+			"Ticking a panel now ticks everything under it, and clearing it clears them."
+		]
+	},
+	{
 		"Version": "4.0.10",
 		"Changes": [
 			"There is now an uninstall.exe in the app folder, for anyone who looks there instead of Add or Remove Programs.",

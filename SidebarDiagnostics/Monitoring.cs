@@ -2381,11 +2381,87 @@ namespace SidebarDiagnostics.Monitoring
             }
             set
             {
+                // Guarded on a real change so that merely re-asserting the current value - which
+                // happens when a preset is applied - does not wipe out per-device choices the user
+                // made underneath it.
+                if (_enabled == value)
+                {
+                    return;
+                }
+
                 _enabled = value;
 
                 NotifyPropertyChanged("Enabled");
+
+                CascadeToHardware(value);
             }
         }
+
+        /// <summary>
+        /// Ticking a panel ticks everything under it, and clearing it clears them.
+        /// </summary>
+        /// <remarks>
+        /// Without this, switching the Drives panel on left every drive under it unticked, so the
+        /// panel appeared enabled and showed nothing - and unticking the panel left ten drives
+        /// still ticked underneath, waiting to reappear.
+        /// </remarks>
+        private void CascadeToHardware(bool enabled)
+        {
+            // Null until the settings window builds it. Nothing to cascade to during load.
+            if (_cascading || _hardwareOC == null)
+            {
+                return;
+            }
+
+            _cascading = true;
+
+            try
+            {
+                foreach (HardwareConfig _hardware in _hardwareOC)
+                {
+                    _hardware.Enabled = enabled;
+                }
+            }
+            finally
+            {
+                _cascading = false;
+            }
+        }
+
+        /// <summary>
+        /// Keeps the panel's own tick in step with the devices under it.
+        /// </summary>
+        private void Hardware_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_cascading || _hardwareOC == null || !string.Equals(e.PropertyName, "Enabled", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            bool _any = _hardwareOC.Any(h => h.Enabled);
+
+            if (_enabled == _any)
+            {
+                return;
+            }
+
+            // Set the field rather than the property: going through the setter would cascade back
+            // down and undo the very change that got us here.
+            _cascading = true;
+
+            try
+            {
+                _enabled = _any;
+
+                NotifyPropertyChanged("Enabled");
+            }
+            finally
+            {
+                _cascading = false;
+            }
+        }
+
+        private bool _cascading { get; set; }
 
         private byte _order { get; set; }
 
@@ -2431,7 +2507,34 @@ namespace SidebarDiagnostics.Monitoring
             }
             set
             {
+                if (_hardwareOC != null)
+                {
+                    foreach (HardwareConfig _old in _hardwareOC)
+                    {
+                        _old.PropertyChanged -= Hardware_PropertyChanged;
+                    }
+                }
+
                 _hardwareOC = value;
+
+                if (_hardwareOC != null)
+                {
+                    foreach (HardwareConfig _new in _hardwareOC)
+                    {
+                        _new.PropertyChanged += Hardware_PropertyChanged;
+                    }
+
+                    // A panel that is off should not show a list of ticked devices underneath it.
+                    // That is what a saved config looks like when a preset switched the panel off:
+                    // the panel's own tick was cleared, and the devices kept the ticked state they
+                    // default to, so the settings window opened showing Drives off above ten ticked
+                    // drives. Only forced downwards - a panel that is on leaves its devices alone,
+                    // because some of them being off is a real choice somebody made.
+                    if (!_enabled)
+                    {
+                        CascadeToHardware(false);
+                    }
+                }
 
                 NotifyPropertyChanged("HardwareOC");
             }
