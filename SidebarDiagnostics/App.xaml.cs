@@ -113,10 +113,15 @@ namespace SidebarDiagnostics
         /// Removes everything the app leaves outside its own folder, on uninstall.
         /// </summary>
         /// <remarks>
-        /// The installer deletes the install directory and its own registry entry, and nothing
-        /// else. Two things live outside it: the "SidebarStartup" scheduled task, which would
-        /// otherwise survive as a logon task pointing at an exe that no longer exists, and the
-        /// Application event log source the startup-task error path registers under HKLM.
+        /// The installer deletes the install directory, the shortcuts and its own registry entry,
+        /// and nothing else. Left to itself that leaves behind the "SidebarStartup" scheduled task
+        /// - a logon task still asking for elevation to run an exe that is gone - the Application
+        /// event log source the startup-task error path registers under HKLM, and, worst of the
+        /// three, the app itself still running.
+        ///
+        /// A running copy is not just untidy: the app runs elevated and this hook does not, so
+        /// nothing here can close it, and while it lives it holds its own exe open and the
+        /// installer cannot delete the folder around it.
         ///
         /// Settings live inside the install directory, so the installer already takes them - the
         /// delete here is for the case where that stops being true.
@@ -126,43 +131,8 @@ namespace SidebarDiagnostics
         /// </remarks>
         private static void CleanUp()
         {
-            // The uninstall hook runs un-elevated, but the task was registered by an elevated
-            // process at Highest run level, so deleting it needs elevation of its own. Only ask for
-            // it when there is actually a task to remove - most people never turn the option on,
-            // and a UAC prompt during an uninstall they did not expect is its own kind of mess.
-            bool _taskExists = false;
-
-            try
-            {
-                _taskExists = Utilities.Startup.StartupTaskRegistered();
-            }
-            catch { }
-
-            if (_taskExists)
-            {
-                try
-                {
-                    Utilities.Startup.DisableStartupTask();
-                }
-                catch
-                {
-                    try
-                    {
-                        // Fire and forget. This is a "fast callback" - Velopack gives it a short
-                        // budget and it must not sit waiting on a UAC prompt.
-                        Process.Start(new ProcessStartInfo()
-                        {
-                            FileName = "schtasks.exe",
-                            Arguments = string.Format("/delete /tn \"{0}\" /f", Constants.Generic.TASKNAME),
-                            UseShellExecute = true,
-                            Verb = "runas",
-                            WindowStyle = ProcessWindowStyle.Hidden
-                        });
-                    }
-                    catch { }
-                }
-            }
-
+            // Steps that need no extra rights come first, so they still happen even if the
+            // elevated step below is refused.
             try
             {
                 if (EventLog.SourceExists(Framework.Resources.AppName))
@@ -177,6 +147,61 @@ namespace SidebarDiagnostics
                 if (File.Exists(Utilities.Paths.SettingsFile))
                 {
                     File.Delete(Utilities.Paths.SettingsFile);
+                }
+            }
+            catch { }
+
+            // The remaining work needs administrator rights, so it goes out as one batch - one
+            // prompt rather than two - and only when there is actually something to do.
+            List<string> _steps = new List<string>();
+
+            // Close any copy that is still running. This hook is not elevated and the app is, so
+            // it cannot be killed from here; and while it runs it holds its own exe open, which
+            // stops the installer from deleting the folder that exe lives in.
+            try
+            {
+                int _self = Process.GetCurrentProcess().Id;
+
+                if (Process.GetProcessesByName(Utilities.Paths.AssemblyName).Any(p => p.Id != _self))
+                {
+                    _steps.Add(string.Format("taskkill /f /im \"{0}\" /fi \"PID ne {1}\"", Utilities.Paths.ExeName, _self));
+                }
+            }
+            catch { }
+
+            // Registered at Highest run level by an elevated process, so removing it takes the
+            // same rights. Left alone it survives as a logon task pointing at an exe that is gone.
+            try
+            {
+                if (Utilities.Startup.StartupTaskRegistered())
+                {
+                    _steps.Add(string.Format("schtasks /delete /tn \"{0}\" /f", Constants.Generic.TASKNAME));
+                }
+            }
+            catch { }
+
+            if (_steps.Count == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                Process _elevated = Process.Start(new ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = "/c " + string.Join(" & ", _steps.ToArray()),
+                    UseShellExecute = true,
+                    Verb = "runas",
+                    WindowStyle = ProcessWindowStyle.Hidden
+                });
+
+                // Bounded wait rather than fire and forget: the installer starts deleting the app
+                // folder the moment this returns, and that fails while the old process still has
+                // its exe open. Capped so a dismissed prompt cannot hang the uninstall.
+                if (_elevated != null)
+                {
+                    _elevated.WaitForExit(15000);
                 }
             }
             catch { }

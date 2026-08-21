@@ -1,5 +1,12 @@
 ﻿[
 	{
+		"Version": "4.0.7",
+		"Changes": [
+			"Uninstalling now closes the app if it is running, instead of leaving it open.",
+			"Uninstalling now really does remove the start-at-logon task."
+		]
+	},
+	{
 		"Version": "4.0.6",
 		"Changes": [
 			"Fixed the app crashing on startup with a \"Cannot find resource\" error."
