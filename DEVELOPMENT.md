@@ -242,6 +242,38 @@ version that differs from the release it came from. Releases are drafts: the mai
 `vpk` needs a subcommand - `vpk --version` fails with *"Required command was not provided"*, which
 looks like a broken install and is not one.
 
+### Installer traps, all paid for the hard way
+
+**Never set `requireAdministrator` in app.manifest.** The installer starts the exe with
+CreateProcess to run its hooks, and CreateProcess does not elevate - it fails with
+ERROR_ELEVATION_REQUIRED. The install then reports failure and never registers an uninstall entry,
+and updates and the uninstall hook die the same way. The app asks for elevation itself instead.
+
+**Elevate from OnStartup, never the App constructor.** The constructor runs before
+InitializeComponent, so App.xaml's resources do not exist yet - and `Process.Start` with a "runas"
+verb goes through ShellExecuteEx, which pumps a nested message loop. That pump lets the queued
+startup work run early, and the first window opened dies on *"Cannot find resource named
+'FlatWindowStyle'"*. This shipped once, in 4.0.5, and crashed the app on every launch.
+
+**Velopack kills the running app before invoking the uninstall hook**, so a hook that looks for a
+running copy finds none. Its log says so plainly - run `Update.exe --uninstall --verbose` and read
+it rather than theorising; three release cycles went on guesses that the log settled in one.
+
+**Inside the uninstall hook, ask `schtasks`, not managed code.** `TaskService.FindTask` and the
+saved `RunAtStartup` flag both reported "no task" there while the task sat plainly in the
+scheduler. Querying needs no elevation; only deleting does.
+
+**The install directory and the settings directory are the same folder** -
+`%LOCALAPPDATA%\SidebarPcMonitor`, because the Velopack pack id matches `Paths.AssemblyName`. That
+is convenient (uninstall takes the settings with it) but worth knowing before moving either.
+
+**Releases are not code-signed**, so SmartScreen shows "Windows protected your PC" on first run of
+Setup.exe. Users need *More info -> Run anyway*. Fixing this needs a paid certificate.
+
+A full verification is: install from the published Setup.exe, confirm the app runs and the
+uninstall entry exists, then `Update.exe --uninstall` and check all six of - process closed,
+scheduled task gone, install dir gone, registry entry gone, both shortcuts gone.
+
 Commit messages carry no co-author or tooling trailers — the maintainer is the sole author of this
 repository and wants it to read that way.
 
