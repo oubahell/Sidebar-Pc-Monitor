@@ -216,6 +216,31 @@ Each release:
 3. **Branch** — `git checkout -b v4.0.1`. One branch per version.
 4. **Commit** — explain *why* and name the root cause (see history for tone).
 5. **Push** — `git push -u origin v4.0.1`. Leave merging to `main` to the maintainer.
+6. **Tag** — `git push origin refs/tags/v4.0.3`. The tag is what builds and publishes the release.
+
+⚠️ **Push tags with the full `refs/tags/` path.** Branches are named `v4.0.3` too, so a bare
+`git push origin v4.0.3` fails with *"src refspec matches more than one"*, and afterwards
+`git checkout v4.0.3` is ambiguous between the two. Worth renaming the branch convention to
+`release/4.0.4` at some point; the tag has to stay `vX.Y.Z` because that is what the in-app
+updater looks for on GitHub.
+
+### What the tag does
+
+`.github/workflows/release.yml` builds LibreHardwareMonitorLib (net472 only), restores NuGet,
+builds the app, and runs `vpk pack` to produce four things, published as a **draft** release:
+
+| Asset | For |
+| --- | --- |
+| `SidebarPcMonitor-win-Setup.exe` | per-user install, no admin prompt, gets automatic updates |
+| `SidebarPcMonitor-win.msi` | machine-wide install, for deploying across an organisation |
+| `SidebarPcMonitor-win-Portable.zip` | run without installing |
+| `.nupkg`, `RELEASES`, `*.json` | not for people to click - the in-app updater reads these |
+
+The job fails if the tag and `AssemblyInfo.cs` disagree, so the installed app can never report a
+version that differs from the release it came from. Releases are drafts: the maintainer publishes.
+
+`vpk` needs a subcommand - `vpk --version` fails with *"Required command was not provided"*, which
+looks like a broken install and is not one.
 
 Commit messages carry no co-author or tooling trailers — the maintainer is the sole author of this
 repository and wants it to read that way.
