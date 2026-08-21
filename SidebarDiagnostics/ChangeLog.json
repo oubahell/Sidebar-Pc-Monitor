@@ -1,5 +1,11 @@
 ﻿[
 	{
+		"Version": "4.0.12",
+		"Changes": [
+			"The settings window no longer runs off the bottom of the screen when you expand a monitor - it now moves itself back into view."
+		]
+	},
+	{
 		"Version": "4.0.11",
 		"Changes": [
 			"The settings window no longer grows past the bottom of the screen when you expand a monitor with a lot of hardware - it scrolls instead.",

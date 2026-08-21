@@ -15,6 +15,7 @@
         xmlns:frame="clr-namespace:SidebarDiagnostics.Framework"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
+        SizeChanged="Window_SizeChanged"
         Closing="Window_Closing"
         Closed="Window_Closed"
         Title="{x:Static frame:Resources.SettingsTitle}"

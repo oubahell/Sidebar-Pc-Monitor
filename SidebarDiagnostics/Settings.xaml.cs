@@ -373,6 +373,49 @@ namespace SidebarDiagnostics
             Close();
         }
 
+        /// <summary>
+        /// Keeps the window inside the screen's working area whenever it changes size.
+        /// </summary>
+        /// <remarks>
+        /// The window sizes itself to its content, and expanding a monitor row adds a line per
+        /// piece of hardware - ten drives makes it much taller. WPF grows a window downwards from
+        /// wherever its top edge already is, and moves nothing, so a window opened centred and then
+        /// expanded ran off the bottom of the screen, taking Save, Apply and Close with it.
+        ///
+        /// MaxHeight caps how tall it can get. It says nothing about where it sits, which is what
+        /// was actually wrong: the height was already being capped correctly and the window still
+        /// ended up half below the desktop.
+        ///
+        /// Uses the primary working area, which is where this window opens. Dragged onto another
+        /// monitor and expanded, the worst this does is pull it back towards the primary - visible,
+        /// if not where it was left.
+        /// </remarks>
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (double.IsNaN(Top) || ActualHeight <= 0)
+            {
+                return;
+            }
+
+            Rect _work = SystemParameters.WorkArea;
+            double _top = Top;
+
+            if (_top + ActualHeight > _work.Bottom)
+            {
+                _top = _work.Bottom - ActualHeight;
+            }
+
+            if (_top < _work.Top)
+            {
+                _top = _work.Top;
+            }
+
+            if (_top != Top)
+            {
+                Top = _top;
+            }
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Hotkey.Disable();

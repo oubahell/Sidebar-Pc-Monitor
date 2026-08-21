@@ -47,10 +47,21 @@ real fix keeps reporting the old failure.
 
 ### The running app locks the .exe and you usually cannot kill it
 
-`app.manifest` sets `requireAdministrator`, so the running app is elevated. A non-elevated agent
-shell **cannot** `Stop-Process` it, and the build then fails with `MSB3027 … file is locked`.
+The manifest says `asInvoker`, but the app elevates itself at startup (see the installer traps
+below), so the *running* process is elevated all the same. A non-elevated agent shell **cannot**
+`Stop-Process` it, and the build then fails with `MSB3027 … file is locked`.
 
-**Ask the user to close the app.** Do not spin on retries.
+Either ask the user to close it, or run the kill through an elevated helper — the user gets one UAC
+prompt and it works:
+
+```powershell
+Set-Content "$scratch\kill.ps1" 'Stop-Process -Name SidebarPcMonitor -Force -ErrorAction SilentlyContinue'
+Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile","-File","`"$scratch\kill.ps1`"" -Wait
+```
+
+For the same reason **you cannot drive the app's UI at all**: Windows blocks input from a lower
+integrity level, so `SetCursorPos` returns `False` and `SendKeys` goes nowhere. Screenshots work;
+clicks do not. Plan verification around that — see below.
 
 To type-check without deploying, build to a scratch folder:
 
@@ -70,9 +81,24 @@ The user's layout: virtual screen `4480x1440`, origin `(-2560,-182)`; sidebar do
 in the same coordinate space as `SetCursorPos`, so enumerate windows to get exact coordinates rather
 than guessing — guessed crops wasted several rounds.
 
-Simulated clicks to drive the Settings UI are **unreliable** (first click often only focuses the
-window; tabs frequently do not switch). Prefer temporarily setting `SelectedIndex` on the TabControl,
-and always strip such scaffolding before committing.
+Clicks cannot be simulated into the elevated app at all (see above). Two techniques replace them,
+and both beat asking the user to click through every change:
+
+**Test the model directly.** `MonitorConfig`, `HardwareConfig` and friends are public, so load the
+built exe as an assembly and exercise them — this verified the whole panel/hardware tick cascade
+without opening a window:
+
+```powershell
+$onResolve = [System.ResolveEventHandler]{ param($s,$e)
+  $n = (New-Object System.Reflection.AssemblyName($e.Name)).Name
+  $p = Join-Path $rel "$n.dll"; if (Test-Path $p) { [System.Reflection.Assembly]::LoadFrom($p) } else { $null } }
+[System.AppDomain]::CurrentDomain.add_AssemblyResolve($onResolve)
+$asm = [System.Reflection.Assembly]::LoadFrom("$rel\SidebarPcMonitor.exe")
+```
+
+**Reproduce window behaviour in a bare WPF harness.** A plain `Window` with the same
+`SizeToContent`/`MaxHeight`/`WindowStartupLocation` settings reproduced the settings window running
+off the bottom of the screen exactly — 247px — and proved the fix, in one command.
 
 ---
 
@@ -156,6 +182,23 @@ Repeatedly cost time while theming:
 Per-theme `SystemColors` brush overrides live in each `Themes/*.xaml` to catch other third-party
 popups.
 
+### 5. SizeToContent caps how big a window gets, never where it sits
+
+The settings window sizes to its content. Expanding a monitor row adds a line per piece of hardware,
+and on a machine with ten drives it grew off the bottom of the screen, taking Save, Apply and Close
+with it.
+
+`MaxHeight` was added and **the bug did not change**, which is the interesting part. The cap was
+working perfectly — verified in a harness: content asking for 3000px produced a window of exactly
+`SystemParameters.WorkArea.Height`. The problem was never the height. WPF grows a window *downwards
+from its existing top edge*, so a window opened centred at `top=247` and then grown to the 1032 cap
+ends at `1279` on a desktop 1032 tall — 247px below the world.
+
+Anything that resizes itself needs a `SizeChanged` handler that pulls it back into
+`SystemParameters.WorkArea`. Capping the size is half a fix.
+
+Related: tab content needs a `ScrollViewer` or the extra rows have nowhere to go. Both were needed.
+
 ### 4. Settings resets must not leave state only valid after a restart
 
 `Settings.Reset()` originally set `MonitorConfig = null`, relying on `CheckConfig` at startup to
@@ -183,7 +226,12 @@ preferences).
 - **Metric presets** — Simple / Gamer / Advanced / Custom (`MetricPresets` in `Monitoring.cs`).
   Custom is *derived*, never chosen: editing any metric re-runs `Detect()`. `Apply()` also switches a
   **panel** off when a preset gives it nothing to show (otherwise Drives sat there empty).
-  **Simple is the shipped default** — enabling everything is a wall of numbers.
+  **Gamer is the shipped default**, matching the maintainer's own tuned config. CPU voltage,
+  package power and current were removed from it in 4.0.10 — they swing hard at idle and read as
+  noise; current went with them because amps on screen with no watts beside them looks broken.
+  Ticking a panel now ticks the hardware under it and clearing it clears them, in both directions
+  (`MonitorConfig.CascadeToHardware` / `Hardware_PropertyChanged`, guarded against recursion and
+  acting only on a real change so applying a preset cannot wipe per-device choices).
 - **Power panel** — the only panel that aggregates across hardware types. CPU package W and GPU
   board W are **measured**; RAM/drives/fans/chipset are a configurable estimate (default 60 W),
   divided by PSU efficiency, then by mains voltage for amps. Labelled **"(est.)"** on purpose, and
@@ -195,6 +243,21 @@ preferences).
 - **UI rework** — button hierarchy (`WindowButton` primary / `SecondaryButton` / `NeutralButton`
   ghost), flat Win11-style caption buttons, themed checkboxes and sliders, Reset Colors, Reset to
   Defaults.
+- **First-run language picker** (`LanguageSetup.xaml`) — asked before the setup wizard, so
+  everything after it is already translated. Must run **before** `Culture.SetCurrent(true)`, whose
+  `OverrideMetadata` call works once per process. Stores the *specific* culture (`ar-SA`), because
+  that is what the Settings list offers; storing the neutral one leaves that box blank.
+- **Changing the language restarts the app** (`App.Restart`). Every string is bound with `x:Static`,
+  which XAML resolves once at window load, so repointing `Resources.Culture` under a live window
+  changes nothing. Reloading only the sidebar rebuilds it from the same already-resolved strings —
+  which is exactly why it used to look like the setting was being ignored.
+- **Update notifications** — on by default, checked on every launch, off the startup path. It only
+  looks; finding something shows a tray balloon and installing waits for a click. Launch-time
+  failures stay silent, the tray menu's own check reports properly.
+- **`uninstall.exe`** — Velopack writes no uninstaller into the folder, so packaging ships a copy of
+  the app exe under that name; the app recognises its own filename and hands over to
+  `Update.exe --uninstall`. A copy, not a stub, because it lands beside the DLLs it needs to start.
+- **Tray icon** — single click shows the sidebar, double click opens Settings.
 
 ---
 
@@ -295,9 +358,23 @@ build type-checks — but **never** report a fix as done off a scratch build (se
 
 ## Known-open items
 
+- **Code signing**: applied to the [SignPath Foundation](https://signpath.org) on 2026-08-21,
+  awaiting a reply. Approval is uncertain — they weigh reputation, and at submission the repo was
+  three days old with no stars. On approval, two jobs: add the required attribution line to the
+  README and release notes (**not before** — it would be a false claim on the page they check), and
+  wire signing into `release.yml`. Velopack needs two passes: app files before `vpk pack`, then the
+  resulting `Setup.exe` and `.msi`. Until then releases are unsigned and SmartScreen warns.
+- **Dead dependencies still shipped**: `Mono.Cecil`, `SharpCompress`, `Splat` and
+  `DeltaCompressionDotNet` are referenced in the `.csproj` and `packages.config` but have zero
+  references in code — leftovers from Squirrel, which Velopack replaced. Roughly 700KB in every
+  download. Safe to remove; not yet done.
+- **`DonateURL` in `App.config` still points at the upstream author's PayPal.** Harmless today
+  because the donate menu item is hidden, but it pays the wrong person the moment anyone re-enables
+  it. The user intends USDT on TRC20 and has not supplied an address.
 - Total system wattage is an estimate; never validated against a wall meter. The user intends to.
 - Top/bottom docking is **half-built**: `DockEdge` already declares `Top`/`Bottom`, but only
   `SetWidth` exists (needs `SetHeight`), the dropdown offers only Left/Right, and panels would need
   to flow horizontally.
 - Acrylic/blur backdrop discussed, not started.
-- The user's next stated interest is more work on presentation style.
+- `Hardcodet.NotifyIcon.Wpf` is CPOL, which is not OSI-approved. Declared honestly in the SignPath
+  application rather than glossed over; may need replacing if it blocks eligibility.
