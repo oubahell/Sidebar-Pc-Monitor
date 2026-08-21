@@ -364,10 +364,6 @@ build type-checks — but **never** report a fix as done off a scratch build (se
   README and release notes (**not before** — it would be a false claim on the page they check), and
   wire signing into `release.yml`. Velopack needs two passes: app files before `vpk pack`, then the
   resulting `Setup.exe` and `.msi`. Until then releases are unsigned and SmartScreen warns.
-- **Dead dependencies still shipped**: `Mono.Cecil`, `SharpCompress`, `Splat` and
-  `DeltaCompressionDotNet` are referenced in the `.csproj` and `packages.config` but have zero
-  references in code — leftovers from Squirrel, which Velopack replaced. Roughly 700KB in every
-  download. Safe to remove; not yet done.
 - **`DonateURL` in `App.config` still points at the upstream author's PayPal.** Harmless today
   because the donate menu item is hidden, but it pays the wrong person the moment anyone re-enables
   it. The user intends USDT on TRC20 and has not supplied an address.

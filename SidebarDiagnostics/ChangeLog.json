@@ -1,5 +1,11 @@
 ﻿[
 	{
+		"Version": "4.0.14",
+		"Changes": [
+			"Removed 945 KB of unused libraries left over from the old updater - smaller download, same app."
+		]
+	},
+	{
 		"Version": "4.0.13",
 		"Changes": [
 			"Added a Donate option to the tray menu, with local Iraqi payment methods and cryptocurrency."
