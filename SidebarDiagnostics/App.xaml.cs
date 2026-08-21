@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
 using Velopack;
@@ -40,7 +41,73 @@ namespace SidebarDiagnostics
             VelopackApp.Build()
                 .OnBeforeUninstallFastCallback(_v => CleanUp())
                 .Run();
+
+            // Run() returns only on an ordinary launch - it exits the process itself when it finds
+            // an installer hook. So by here we know this is the real app starting, and it needs
+            // administrator rights: LibreHardwareMonitor cannot open a single sensor without them.
+            Elevate();
         }
+
+        /// <summary>
+        /// Relaunches the app elevated and ends this process, unless it is elevated already.
+        /// </summary>
+        /// <remarks>
+        /// The manifest asks for asInvoker rather than requireAdministrator, so this has to be done
+        /// by hand. requireAdministrator looks like the obvious choice and is a trap: the installer
+        /// launches the exe with CreateProcess to run its hooks, CreateProcess refuses to elevate,
+        /// and the install fails without ever registering an uninstaller.
+        ///
+        /// It has to come after VelopackApp.Run() for the same reason - the hooks must be able to
+        /// do their work in this un-elevated process and exit.
+        ///
+        /// The startup scheduled task runs the app elevated already, so a logon start goes straight
+        /// past this with no prompt. A manual launch costs one UAC prompt, which is what the old
+        /// manifest cost too.
+        /// </remarks>
+        private static void Elevate()
+        {
+            if (IsElevated())
+            {
+                return;
+            }
+
+            string[] _args = Environment.GetCommandLineArgs().Skip(1).ToArray();
+
+            // Guard against a relaunch loop: if the elevated copy somehow comes back un-elevated,
+            // carry on degraded rather than spawning copies of ourselves forever.
+            if (_args.Contains(ELEVATED_ARG, StringComparer.Ordinal))
+            {
+                return;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = Process.GetCurrentProcess().MainModule.FileName,
+                    Arguments = string.Join(" ", _args.Concat(new string[] { ELEVATED_ARG })),
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                // The user dismissed the prompt. Nothing useful left to do - without elevation
+                // every reading would be blank - so leave quietly rather than showing an error.
+            }
+
+            Environment.Exit(0);
+        }
+
+        private static bool IsElevated()
+        {
+            using (WindowsIdentity _identity = WindowsIdentity.GetCurrent())
+            {
+                return new WindowsPrincipal(_identity).IsInRole(WindowsBuiltInRole.Administrator);
+            }
+        }
+
+        private const string ELEVATED_ARG = "--elevated";
 
         /// <summary>
         /// Removes everything the app leaves outside its own folder, on uninstall.
@@ -59,11 +126,42 @@ namespace SidebarDiagnostics
         /// </remarks>
         private static void CleanUp()
         {
+            // The uninstall hook runs un-elevated, but the task was registered by an elevated
+            // process at Highest run level, so deleting it needs elevation of its own. Only ask for
+            // it when there is actually a task to remove - most people never turn the option on,
+            // and a UAC prompt during an uninstall they did not expect is its own kind of mess.
+            bool _taskExists = false;
+
             try
             {
-                Utilities.Startup.DisableStartupTask();
+                _taskExists = Utilities.Startup.StartupTaskRegistered();
             }
             catch { }
+
+            if (_taskExists)
+            {
+                try
+                {
+                    Utilities.Startup.DisableStartupTask();
+                }
+                catch
+                {
+                    try
+                    {
+                        // Fire and forget. This is a "fast callback" - Velopack gives it a short
+                        // budget and it must not sit waiting on a UAC prompt.
+                        Process.Start(new ProcessStartInfo()
+                        {
+                            FileName = "schtasks.exe",
+                            Arguments = string.Format("/delete /tn \"{0}\" /f", Constants.Generic.TASKNAME),
+                            UseShellExecute = true,
+                            Verb = "runas",
+                            WindowStyle = ProcessWindowStyle.Hidden
+                        });
+                    }
+                    catch { }
+                }
+            }
 
             try
             {

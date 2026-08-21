@@ -1,5 +1,13 @@
 ﻿[
 	{
+		"Version": "4.0.5",
+		"Changes": [
+			"Fixed the installer failing part way through and never registering an uninstall entry.",
+			"Automatic updates work again for the same reason.",
+			"The app still asks for administrator rights, which it needs to read your sensors."
+		]
+	},
+	{
 		"Version": "4.0.4",
 		"Changes": [
 			"Uninstalling now removes the start-at-logon task and the settings file, instead of leaving them behind."

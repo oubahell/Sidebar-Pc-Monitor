@@ -5,7 +5,13 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+        <!-- asInvoker, even though the app cannot read a single sensor without admin.
+             requireAdministrator here made the app unlaunchable by its own installer: Velopack
+             starts the exe with CreateProcess to run the install, update and uninstall hooks, and
+             CreateProcess does not elevate - it fails outright with ERROR_ELEVATION_REQUIRED. The
+             install then reported failure and never registered the uninstall entry.
+             The app elevates itself instead, once the hooks have had their turn. See App.xaml.cs. -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
       <applicationRequestMinimum>
         <defaultAssemblyRequest permissionSetReference="Custom" />

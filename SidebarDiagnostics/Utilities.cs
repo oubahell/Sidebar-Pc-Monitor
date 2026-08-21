@@ -137,6 +137,22 @@ namespace SidebarDiagnostics.Utilities
             }
         }
 
+        /// <summary>
+        /// Whether a task by our name exists at all, whatever it points at.
+        /// </summary>
+        /// <remarks>
+        /// StartupTaskExists() additionally checks the task runs *this* exe, which is the right
+        /// question for the settings toggle. Uninstall needs the looser one: a task left pointing
+        /// at a previous install path is precisely the leftover worth clearing.
+        /// </remarks>
+        public static bool StartupTaskRegistered()
+        {
+            using (TaskService _taskService = new TaskService())
+            {
+                return _taskService.FindTask(Constants.Generic.TASKNAME) != null;
+            }
+        }
+
         public static void EnableStartupTask(string exePath = null)
         {
             try
