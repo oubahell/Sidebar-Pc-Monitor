@@ -33,6 +33,7 @@ namespace SidebarDiagnostics
             Model.Save();
 
             App.ApplyTheme(Model.Theme);
+            Framework.LayoutManager.Apply(Model.Layout);
 
             await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, (Action)(async () =>
             {
@@ -307,6 +308,38 @@ namespace SidebarDiagnostics
         private void ResetColorsButton_Click(object sender, RoutedEventArgs e)
         {
             Model.ResetColorsToTheme();
+        }
+
+        private async void ResetDefaultsButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult _confirm = MessageBox.Show(
+                Framework.Resources.SettingsResetAllConfirm,
+                Framework.Resources.SettingsResetAll,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No,
+                MessageBoxOptions.DefaultDesktopOnly);
+
+            if (_confirm != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            Framework.Settings.Instance.Reset();
+            Framework.Settings.Instance.Save();
+
+            App.ApplyTheme(Framework.Settings.Instance.Theme);
+
+            // Rebuild the view model so the dialog reflects the restored values, then run the normal
+            // save/apply path to push them out to the sidebar.
+            Sidebar _sidebar = App.Current.Sidebar;
+
+            if (_sidebar != null)
+            {
+                DataContext = Model = new SettingsModel(_sidebar);
+            }
+
+            await Save(false);
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

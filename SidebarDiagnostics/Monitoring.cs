@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -88,6 +88,11 @@ namespace SidebarDiagnostics.Monitoring
                 case MonitorType.Network:
                     return NetworkMonitor.GetHardware().ToArray();
 
+                // Aggregates across the machine rather than listing selectable devices, so there is
+                // nothing to offer in the hardware picker.
+                case MonitorType.Power:
+                    return new HardwareConfig[0];
+
                 default:
                     throw new ArgumentException("Invalid MonitorType.");
             }
@@ -168,6 +173,13 @@ namespace SidebarDiagnostics.Monitoring
                         config.Params
                         );
 
+                case MonitorType.Power:
+                    return PowerPanel(
+                        config.Type,
+                        config.Metrics,
+                        config.Params
+                        );
+
                 default:
                     throw new ArgumentException("Invalid MonitorType.");
             }
@@ -179,6 +191,44 @@ namespace SidebarDiagnostics.Monitoring
                 type.GetDescription(),
                 pathData,
                 OHMMonitor.GetInstances(hardwareConfig, metrics, parameters, type, _board, GetHardware(hardwareTypes).ToArray())
+                );
+        }
+
+        /// <summary>
+        /// Aggregates power across the whole machine, so unlike the other panels it reaches into
+        /// several hardware types at once rather than mapping to one.
+        /// </summary>
+        private MonitorPanel PowerPanel(MonitorType type, MetricConfig[] metrics, ConfigParam[] parameters)
+        {
+            List<ISensor> _powerSensors = new List<ISensor>();
+
+            IHardware _cpu = GetHardware(HardwareType.Cpu).FirstOrDefault();
+
+            if (_cpu != null)
+            {
+                ISensor _cpuPower = _cpu.Sensors.Where(s => s.SensorType == SensorType.Power && s.Name.Equals("Package", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+                if (_cpuPower != null)
+                {
+                    _powerSensors.Add(_cpuPower);
+                }
+            }
+
+            // Every GPU, so multi-card systems are accounted for rather than just the first.
+            foreach (IHardware _gpu in GetHardware(HardwareType.GpuNvidia, HardwareType.GpuAmd, HardwareType.GpuIntel))
+            {
+                ISensor _gpuPower = _gpu.Sensors.Where(s => s.SensorType == SensorType.Power).OrderBy(s => s.Index).FirstOrDefault();
+
+                if (_gpuPower != null)
+                {
+                    _powerSensors.Add(_gpuPower);
+                }
+            }
+
+            return new MonitorPanel(
+                type.GetDescription(),
+                "M 33,19L 45,19L 38,33L 48,33L 27,57L 32,39L 22,39L 33,19 Z",
+                PowerMonitor.GetInstances(_powerSensors.ToArray(), metrics, parameters)
                 );
         }
 
@@ -545,7 +595,11 @@ namespace SidebarDiagnostics.Monitoring
                 where n.Enabled
                 orderby n.Order descending, n.Name ascending
                 select new OHMMonitor(type, n.ID, n.Name ?? n.ActualName, hw, board, metrics, parameters)
-                ).ToArray();
+                )
+                // A device whose sensors none of the enabled metrics matched has nothing to draw,
+                // and would otherwise occupy a run of blank space in the sidebar.
+                .Where(m => m.Metrics.Length > 0)
+                .ToArray();
         }
 
         public override void Update()
@@ -668,6 +722,34 @@ namespace SidebarDiagnostics.Monitoring
                 }
             }
 
+            // Package power draw in watts, read from the CPU's energy counters. "Package" is the
+            // whole-chip figure (cores plus SoC/uncore), which is the number worth showing -- the
+            // per-core SMU sensors alongside it only account for the cores themselves.
+            if (metrics.IsEnabled(MetricKey.CPUPower))
+            {
+                ISensor _power = _hardware.Sensors.Where(s => s.SensorType == SensorType.Power && s.Name.Equals("Package", StringComparison.OrdinalIgnoreCase)).FirstOrDefault() ??
+                    _hardware.Sensors.Where(s => s.SensorType == SensorType.Power).OrderBy(s => s.Index).FirstOrDefault();
+
+                if (_power != null)
+                {
+                    _sensorList.Add(new OHMMetric(_power, MetricKey.CPUPower, DataType.Watt, null, roundAll));
+                }
+            }
+
+            // Current in amps, from the SMU's TDC reading -- the sustained current the VRM is
+            // actually delivering to the socket. Preferred over EDC, which reports the peak
+            // electrical limit rather than the present draw.
+            if (metrics.IsEnabled(MetricKey.CPUCurrent))
+            {
+                ISensor _current = _hardware.Sensors.Where(s => s.SensorType == SensorType.Current && s.Name.Equals("TDC", StringComparison.OrdinalIgnoreCase)).FirstOrDefault() ??
+                    _hardware.Sensors.Where(s => s.SensorType == SensorType.Current).OrderBy(s => s.Index).FirstOrDefault();
+
+                if (_current != null)
+                {
+                    _sensorList.Add(new OHMMetric(_current, MetricKey.CPUCurrent, DataType.Amp, null, roundAll));
+                }
+            }
+
             bool _loadEnabled = metrics.IsEnabled(MetricKey.CPULoad);
             bool _coreLoadEnabled = metrics.IsEnabled(MetricKey.CPUCoreLoad);
 
@@ -687,15 +769,48 @@ namespace SidebarDiagnostics.Monitoring
                         }
                     }
 
+                    // The busiest single core, which is a far more useful summary of CPU pressure
+                    // than a wall of per-core rows (a single pegged core is invisible in the total).
+                    if (metrics.IsEnabled(MetricKey.CPUCoreMax))
+                    {
+                        ISensor _coreMax = _loadSensors.Where(s => s.Name.Equals("CPU Core Max", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+                        if (_coreMax != null)
+                        {
+                            _sensorList.Add(new OHMMetric(_coreMax, MetricKey.CPUCoreMax, DataType.Percent, null, roundAll));
+                        }
+                    }
+
                     if (_coreLoadEnabled)
                     {
-                        for (int i = 1; i <= _loadSensors.Max(s => s.Index); i++)
-                        {
-                            ISensor _coreLoad = _loadSensors.Where(s => s.Index == i).FirstOrDefault();
+                        // Matched by name rather than by index. LibreHardwareMonitor now reports an
+                        // aggregate "CPU Core Max" sensor ahead of the per-core ones, which shifted
+                        // every real core up by one index: the old index arithmetic produced one
+                        // bogus extra row (the aggregate, labelled as a core) and mislabelled the
+                        // rest. The core number now comes from the sensor's own name.
+                        Regex _coreRegex = new Regex(@"^CPU Core #(\d+)$");
 
-                            if (_coreLoad != null)
+                        var _cores = _loadSensors
+                            .Select(s => new { Match = _coreRegex.Match(s.Name), Sensor = s })
+                            .Where(s => s.Match.Success)
+                            .Select(s => new { Number = int.Parse(s.Match.Groups[1].Value), s.Sensor })
+                            .OrderBy(s => s.Number)
+                            .ToList();
+
+                        if (_cores.Count > 0)
+                        {
+                            foreach (var _core in _cores)
                             {
-                                _sensorList.Add(new OHMMetric(_coreLoad, MetricKey.CPUCoreLoad, DataType.Percent, string.Format("{0} {1}", Resources.CPUCoreLoadLabel, i - 1), roundAll));
+                                _sensorList.Add(new OHMMetric(_core.Sensor, MetricKey.CPUCoreLoad, DataType.Percent, string.Format("{0} {1}", Resources.CPUCoreLoadLabel, _core.Number), roundAll));
+                            }
+                        }
+                        else
+                        {
+                            // Fall back to the old index walk for CPUs whose per-core sensors don't
+                            // follow the "CPU Core #n" naming, skipping any aggregate sensors.
+                            foreach (ISensor _coreLoad in _loadSensors.Where(s => s.Index > 0 && !s.Name.EndsWith("Max", StringComparison.OrdinalIgnoreCase)).OrderBy(s => s.Index))
+                            {
+                                _sensorList.Add(new OHMMetric(_coreLoad, MetricKey.CPUCoreLoad, DataType.Percent, string.Format("{0} {1}", Resources.CPUCoreLoadLabel, _coreLoad.Index), roundAll));
                             }
                         }
                     }
@@ -739,9 +854,15 @@ namespace SidebarDiagnostics.Monitoring
                 }
             }
 
+            // Matched by name, not index. LibreHardwareMonitor numbers memory sensors globally
+            // across devices rather than restarting per device, so Total Memory owns Load #0 and
+            // Data #0/#1 while Virtual Memory gets Load #1 and Data #2/#3. The old index checks
+            // therefore matched nothing on Virtual Memory, leaving it with no metrics at all and
+            // rendering as a blank gap in the sidebar.
             if (metrics.IsEnabled(MetricKey.RAMLoad))
             {
-                ISensor _loadSensor = _hardware.Sensors.Where(s => s.SensorType == SensorType.Load && s.Index == 0).FirstOrDefault();
+                ISensor _loadSensor = _hardware.Sensors.Where(s => s.SensorType == SensorType.Load && s.Name.Equals("Memory", StringComparison.OrdinalIgnoreCase)).FirstOrDefault() ??
+                    _hardware.Sensors.Where(s => s.SensorType == SensorType.Load).OrderBy(s => s.Index).FirstOrDefault();
 
                 if (_loadSensor != null)
                 {
@@ -751,7 +872,11 @@ namespace SidebarDiagnostics.Monitoring
 
             if (metrics.IsEnabled(MetricKey.RAMUsed))
             {
-                ISensor _usedSensor = _hardware.Sensors.Where(s => s.SensorType == SensorType.Data && s.Index == 0).FirstOrDefault();
+                // Restricted to sensors named "Memory ...": the individual DIMM modules expose a
+                // Data sensor too, but it reports the stick's capacity, which would otherwise be
+                // picked up here and displayed as though it were memory in use.
+                ISensor _usedSensor = _hardware.Sensors.Where(s => s.SensorType == SensorType.Data && s.Name.Equals("Memory Used", StringComparison.OrdinalIgnoreCase)).FirstOrDefault() ??
+                    _hardware.Sensors.Where(s => s.SensorType == SensorType.Data && s.Name.StartsWith("Memory", StringComparison.OrdinalIgnoreCase)).OrderBy(s => s.Index).FirstOrDefault();
 
                 if (_usedSensor != null)
                 {
@@ -761,7 +886,8 @@ namespace SidebarDiagnostics.Monitoring
 
             if (metrics.IsEnabled(MetricKey.RAMFree))
             {
-                ISensor _freeSensor = _hardware.Sensors.Where(s => s.SensorType == SensorType.Data && s.Index == 1).FirstOrDefault();
+                ISensor _freeSensor = _hardware.Sensors.Where(s => s.SensorType == SensorType.Data && s.Name.Equals("Memory Available", StringComparison.OrdinalIgnoreCase)).FirstOrDefault() ??
+                    _hardware.Sensors.Where(s => s.SensorType == SensorType.Data && s.Name.StartsWith("Memory", StringComparison.OrdinalIgnoreCase)).OrderBy(s => s.Index).Skip(1).FirstOrDefault();
 
                 if (_freeSensor != null)
                 {
@@ -848,6 +974,17 @@ namespace SidebarDiagnostics.Monitoring
                 }
             }
 
+            // Board power draw in watts, reported by the driver (NVAPI / ADL).
+            if (metrics.IsEnabled(MetricKey.GPUPower))
+            {
+                ISensor _power = _hardware.Sensors.Where(s => s.SensorType == SensorType.Power).OrderBy(s => s.Index).FirstOrDefault();
+
+                if (_power != null)
+                {
+                    _sensorList.Add(new OHMMetric(_power, MetricKey.GPUPower, DataType.Watt, null, roundAll));
+                }
+            }
+
             if (metrics.IsEnabled(MetricKey.GPUFan))
             {
                 ISensor _fanSensor = _hardware.Sensors.Where(s => s.SensorType == SensorType.Control).OrderBy(s => s.Index).FirstOrDefault();
@@ -855,6 +992,20 @@ namespace SidebarDiagnostics.Monitoring
                 if (_fanSensor != null)
                 {
                     _sensorList.Add(new OHMMetric(_fanSensor, MetricKey.GPUFan, DataType.Percent));
+                }
+            }
+
+            // Fan speed in RPM, which is what tools like MSI Afterburner show. This is a separate
+            // sensor from the Control one above: Control reports the fan curve's duty percentage,
+            // while SensorType.Fan reports actual measured RPM. Cards with a zero-RPM idle mode
+            // legitimately report 0 here until they spin up.
+            if (metrics.IsEnabled(MetricKey.GPUFanRPM))
+            {
+                ISensor _fanRPM = _hardware.Sensors.Where(s => s.SensorType == SensorType.Fan).OrderBy(s => s.Index).FirstOrDefault();
+
+                if (_fanRPM != null)
+                {
+                    _sensorList.Add(new OHMMetric(_fanRPM, MetricKey.GPUFanRPM, DataType.RPM, null, roundAll));
                 }
             }
 
@@ -1160,6 +1311,57 @@ namespace SidebarDiagnostics.Monitoring
         }
     }
 
+    /// <summary>
+    /// Whole-machine power draw. A single monitor with no hardware of its own -- it reads the
+    /// power sensors gathered from the CPU and GPUs and combines them with the configured estimate
+    /// for everything that can't report itself.
+    /// </summary>
+    public class PowerMonitor : BaseMonitor
+    {
+        public PowerMonitor(ISensor[] powerSensors, MetricConfig[] metrics, bool showName, bool roundAll, double overheadWatts, double efficiencyPercent, double mainsVoltage) : base("power", Resources.Power, showName)
+        {
+            List<iMetric> _metrics = new List<iMetric>();
+
+            double _efficiency = efficiencyPercent / 100d;
+
+            if (metrics.IsEnabled(MetricKey.SystemPower))
+            {
+                _metrics.Add(new SystemPowerMetric(powerSensors, overheadWatts, _efficiency, mainsVoltage, false, MetricKey.SystemPower, DataType.Watt, null, roundAll));
+            }
+
+            if (metrics.IsEnabled(MetricKey.SystemCurrent))
+            {
+                _metrics.Add(new SystemPowerMetric(powerSensors, overheadWatts, _efficiency, mainsVoltage, true, MetricKey.SystemCurrent, DataType.Amp, null, roundAll));
+            }
+
+            Metrics = _metrics.ToArray();
+        }
+
+        public static iMonitor[] GetInstances(ISensor[] powerSensors, MetricConfig[] metrics, ConfigParam[] parameters)
+        {
+            return new iMonitor[1]
+            {
+                new PowerMonitor(
+                    powerSensors,
+                    metrics,
+                    false,
+                    parameters.GetValue<bool>(ParamKey.RoundAll),
+                    parameters.GetValue<int>(ParamKey.OtherWattage),
+                    parameters.GetValue<int>(ParamKey.PSUEfficiency),
+                    parameters.GetValue<int>(ParamKey.MainsVoltage)
+                    )
+            };
+        }
+
+        public override void Update()
+        {
+            foreach (iMetric _metric in Metrics)
+            {
+                _metric.Update();
+            }
+        }
+    }
+
     public class NetworkMonitor : BaseMonitor
     {
         private const string CATEGORYNAME = "Network Interface";
@@ -1355,6 +1557,12 @@ namespace SidebarDiagnostics.Monitoring
 
         bool IsNumeric { get; }
 
+        /// <summary>
+        /// Whether this reading is a 0-100 percentage. Layouts use it to decide when a bar or gauge
+        /// is meaningful: a load figure has a natural full scale, a clock speed or wattage does not.
+        /// </summary>
+        bool IsPercent { get; }
+
         void Update();
 
         void Update(double value);
@@ -1381,6 +1589,8 @@ namespace SidebarDiagnostics.Monitoring
             }
 
             nAppend = Append = converter == null ? dataType.GetAppend() : converter.TargetType.GetAppend();
+
+            IsPercent = (converter == null ? dataType : converter.TargetType) == DataType.Percent;
         }
 
         public void Dispose()
@@ -1638,6 +1848,8 @@ namespace SidebarDiagnostics.Monitoring
             get { return true; }
         }
 
+        public bool IsPercent { get; private set; }
+
         public string AlertColor
         {
             get
@@ -1772,6 +1984,100 @@ namespace SidebarDiagnostics.Monitoring
         private bool _disposed { get; set; } = false;
     }
 
+    /// <summary>
+    /// Whole-system power draw, and the mains current that implies.
+    ///
+    /// This is part measurement and part estimate, and it's worth being clear which is which.
+    /// The CPU package and GPU board figures are real sensor readings. Nothing else in a desktop
+    /// reports its own consumption -- RAM exposes capacity and timings but no power, and drives,
+    /// fans, the chipset and VRM losses report nothing at all -- so those are covered by a single
+    /// configurable overhead figure. The result is then divided by the PSU's efficiency to get
+    /// draw at the wall, since the supply itself burns the difference.
+    ///
+    /// Accordingly this tracks the *shape* of consumption accurately (it moves correctly with load,
+    /// because the two components that dominate are measured) while the absolute number carries the
+    /// error of the overhead guess. For a real wall figure you need PSU telemetry or an inline meter.
+    /// </summary>
+    public class SystemPowerMetric : BaseMetric
+    {
+        public SystemPowerMetric(ISensor[] powerSensors, double overheadWatts, double efficiency, double mainsVoltage, bool asCurrent, MetricKey key, DataType dataType, string label = null, bool round = false, double alertValue = 0, iConverter converter = null) : base(key, dataType, label, round, alertValue, converter)
+        {
+            _powerSensors = powerSensors ?? new ISensor[0];
+            _overheadWatts = overheadWatts;
+
+            // Guard the divisors: a zero from a hand-edited config would otherwise produce infinity.
+            _efficiency = efficiency > 0d ? efficiency : 0.9d;
+            _mainsVoltage = mainsVoltage > 0d ? mainsVoltage : 220d;
+
+            _asCurrent = asCurrent;
+        }
+
+        public new void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _powerSensors = null;
+                }
+
+                _disposed = true;
+            }
+        }
+
+        ~SystemPowerMetric()
+        {
+            Dispose(false);
+        }
+
+        public override void Update()
+        {
+            double _componentWatts = 0d;
+            bool _any = false;
+
+            foreach (ISensor _sensor in _powerSensors)
+            {
+                if (_sensor != null && _sensor.Value.HasValue && !float.IsNaN(_sensor.Value.Value))
+                {
+                    _componentWatts += _sensor.Value.Value;
+                    _any = true;
+                }
+            }
+
+            // Without at least one live power sensor the total would be nothing but the overhead
+            // constant, which would look like a real reading while telling the user nothing.
+            if (!_any)
+            {
+                Text = "No Value";
+                return;
+            }
+
+            double _wallWatts = (_componentWatts + _overheadWatts) / _efficiency;
+
+            Update(_asCurrent ? _wallWatts / _mainsVoltage : _wallWatts);
+        }
+
+        private ISensor[] _powerSensors { get; set; }
+
+        private double _overheadWatts { get; set; }
+
+        private double _efficiency { get; set; }
+
+        private double _mainsVoltage { get; set; }
+
+        private bool _asCurrent { get; set; }
+
+        private bool _disposed { get; set; } = false;
+    }
+
     public class IPMetric : BaseMetric
     {
         public IPMetric(string ipAddress, MetricKey key, DataType dataType, string label = null, bool round = false, double alertValue = 0, iConverter converter = null) : base(key, dataType, label, round, alertValue, converter)
@@ -1850,7 +2156,155 @@ namespace SidebarDiagnostics.Monitoring
         RAM,
         GPU,
         HD,
-        Network
+        Network,
+        Power
+    }
+
+    /// <summary>
+    /// Curated sets of metrics. Enabling everything by default produces a wall of numbers that is
+    /// hard to read at a glance, so these trade breadth for legibility -- Custom simply means the
+    /// selection no longer matches any preset.
+    /// </summary>
+    public enum MetricPreset : byte
+    {
+        Simple,
+        Gamer,
+        Advanced,
+        Custom
+    }
+
+    public static class MetricPresets
+    {
+        /// <summary>The metrics each preset switches on. Anything absent is switched off.</summary>
+        public static MetricKey[] GetKeys(MetricPreset preset)
+        {
+            switch (preset)
+            {
+                // Just enough to answer "is anything struggling?" at a glance. Deliberately no drive
+                // metrics: disk usage is a number you check occasionally, not something worth
+                // standing watch over.
+                case MetricPreset.Simple:
+                    return new MetricKey[]
+                    {
+                        MetricKey.CPUTemp, MetricKey.CPULoad,
+                        MetricKey.RAMLoad,
+                        MetricKey.GPUTemp, MetricKey.GPUCoreLoad,
+                        MetricKey.NetworkIn, MetricKey.NetworkOut,
+                        MetricKey.SystemPower
+                    };
+
+                // Thermals, headroom and VRAM -- what actually explains a frame rate drop.
+                case MetricPreset.Gamer:
+                    return new MetricKey[]
+                    {
+                        MetricKey.CPUTemp, MetricKey.CPULoad, MetricKey.CPUCoreMax, MetricKey.CPUClock,
+                        MetricKey.RAMLoad, MetricKey.RAMUsed,
+                        MetricKey.GPUTemp, MetricKey.GPUCoreLoad, MetricKey.GPUVRAMLoad,
+                        MetricKey.GPUCoreClock, MetricKey.GPUFanRPM, MetricKey.GPUPower,
+                        MetricKey.DriveLoadBar,
+                        MetricKey.NetworkIn, MetricKey.NetworkOut,
+                        MetricKey.SystemPower
+                    };
+
+                // Everything meaningful, including the electrical readings.
+                case MetricPreset.Advanced:
+                    return new MetricKey[]
+                    {
+                        MetricKey.CPUClock, MetricKey.CPUTemp, MetricKey.CPUVoltage, MetricKey.CPUPower,
+                        MetricKey.CPUCurrent, MetricKey.CPUFan, MetricKey.CPULoad, MetricKey.CPUCoreMax,
+                        MetricKey.RAMClock, MetricKey.RAMLoad, MetricKey.RAMUsed, MetricKey.RAMFree,
+                        MetricKey.GPUCoreClock, MetricKey.GPUVRAMClock, MetricKey.GPUCoreLoad,
+                        MetricKey.GPUVRAMLoad, MetricKey.GPUVoltage, MetricKey.GPUPower,
+                        MetricKey.GPUTemp, MetricKey.GPUFan, MetricKey.GPUFanRPM,
+                        MetricKey.DriveLoadBar, MetricKey.DriveLoad, MetricKey.DriveUsed,
+                        MetricKey.DriveFree, MetricKey.DriveRead, MetricKey.DriveWrite,
+                        MetricKey.NetworkIP, MetricKey.NetworkIn, MetricKey.NetworkOut,
+                        MetricKey.SystemPower, MetricKey.SystemCurrent
+                    };
+
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Switches each metric on or off to match the preset. Custom is a no-op: it describes a
+        /// hand-picked selection rather than prescribing one.
+        /// </summary>
+        public static void Apply(IEnumerable<MonitorConfig> config, MetricPreset preset)
+        {
+            MetricKey[] _keys = GetKeys(preset);
+
+            if (_keys == null || config == null)
+            {
+                return;
+            }
+
+            foreach (MonitorConfig _monitor in config)
+            {
+                if (_monitor.Metrics == null)
+                {
+                    continue;
+                }
+
+                bool _any = false;
+
+                foreach (MetricConfig _metric in _monitor.Metrics)
+                {
+                    _metric.Enabled = _keys.Contains(_metric.Key);
+
+                    _any |= _metric.Enabled;
+                }
+
+                // A panel the preset gave nothing to show is switched off outright, rather than
+                // being left enabled with every device ticked and no readings behind it.
+                _monitor.Enabled = _any;
+            }
+        }
+
+        /// <summary>
+        /// Works out which preset the current selection corresponds to, so the dropdown reflects
+        /// reality after the user ticks something by hand rather than silently lying.
+        /// </summary>
+        public static MetricPreset Detect(IEnumerable<MonitorConfig> config)
+        {
+            if (config == null)
+            {
+                return MetricPreset.Custom;
+            }
+
+            // Metrics on a disabled panel don't count: the panel isn't drawn, so whatever is ticked
+            // behind it says nothing about what the user is actually being shown.
+            MetricKey[] _enabled = config
+                .Where(m => m.Enabled && m.Metrics != null)
+                .SelectMany(m => m.Metrics)
+                .Where(m => m.Enabled)
+                .Select(m => m.Key)
+                .OrderBy(k => k)
+                .ToArray();
+
+            foreach (MetricPreset _preset in new MetricPreset[] { MetricPreset.Simple, MetricPreset.Gamer, MetricPreset.Advanced })
+            {
+                MetricKey[] _keys = GetKeys(_preset);
+
+                // Compared against the metrics actually present on this machine, so a preset still
+                // matches when it names something this hardware doesn't expose.
+                MetricKey[] _expected = config
+                    .Where(m => m.Metrics != null)
+                    .SelectMany(m => m.Metrics)
+                    .Select(m => m.Key)
+                    .Where(k => _keys.Contains(k))
+                    .OrderBy(k => k)
+                    .ToArray();
+
+                if (_enabled.SequenceEqual(_expected))
+                {
+                    return _preset;
+                }
+            }
+
+            return MetricPreset.Custom;
+        }
     }
 
     [JsonObject(MemberSerialization.OptIn)]
@@ -2068,11 +2522,28 @@ namespace SidebarDiagnostics.Monitoring
             return config;
         }
 
+        /// <summary>
+        /// The shipped configuration. The metric flags below describe everything this app can show;
+        /// <see cref="Default"/> then narrows them to the Simple preset, because enabling the lot
+        /// produces a wall of numbers on first run. Every metric stays one tick away in Settings.
+        /// </summary>
         public static MonitorConfig[] Default
         {
             get
             {
-                return new MonitorConfig[5]
+                MonitorConfig[] _config = DefaultAll;
+
+                MetricPresets.Apply(_config, MetricPreset.Simple);
+
+                return _config;
+            }
+        }
+
+        private static MonitorConfig[] DefaultAll
+        {
+            get
+            {
+                return new MonitorConfig[6]
                 {
                     new MonitorConfig()
                     {
@@ -2080,14 +2551,20 @@ namespace SidebarDiagnostics.Monitoring
                         Enabled = true,
                         Order = 5,
                         Hardware = new HardwareConfig[0],
-                        Metrics = new MetricConfig[6]
+                        Metrics = new MetricConfig[9]
                         {
                             new MetricConfig(MetricKey.CPUClock, true),
                             new MetricConfig(MetricKey.CPUTemp, true),
                             new MetricConfig(MetricKey.CPUVoltage, true),
+                            new MetricConfig(MetricKey.CPUPower, true),
+                            new MetricConfig(MetricKey.CPUCurrent, true),
                             new MetricConfig(MetricKey.CPUFan, true),
                             new MetricConfig(MetricKey.CPULoad, true),
-                            new MetricConfig(MetricKey.CPUCoreLoad, true)
+                            new MetricConfig(MetricKey.CPUCoreMax, true),
+                            // Off by default: on a modern many-thread CPU this is a wall of rows
+                            // (16 on an 8-core/16-thread part) that crowds out everything else.
+                            // CPUCoreMax above carries the same signal in one line.
+                            new MetricConfig(MetricKey.CPUCoreLoad, false)
                         },
                         Params = new ConfigParam[6]
                         {
@@ -2125,15 +2602,17 @@ namespace SidebarDiagnostics.Monitoring
                         Enabled = true,
                         Order = 3,
                         Hardware = new HardwareConfig[0],
-                        Metrics = new MetricConfig[7]
+                        Metrics = new MetricConfig[9]
                         {
                             new MetricConfig(MetricKey.GPUCoreClock, true),
                             new MetricConfig(MetricKey.GPUVRAMClock, true),
                             new MetricConfig(MetricKey.GPUCoreLoad, true),
                             new MetricConfig(MetricKey.GPUVRAMLoad, true),
                             new MetricConfig(MetricKey.GPUVoltage, true),
+                            new MetricConfig(MetricKey.GPUPower, true),
                             new MetricConfig(MetricKey.GPUTemp, true),
-                            new MetricConfig(MetricKey.GPUFan, true)
+                            new MetricConfig(MetricKey.GPUFan, true),
+                            new MetricConfig(MetricKey.GPUFanRPM, true)
                         },
                         Params = new ConfigParam[5]
                         {
@@ -2185,6 +2664,25 @@ namespace SidebarDiagnostics.Monitoring
                             ConfigParam.Defaults.UseBytes,
                             ConfigParam.Defaults.BandwidthInAlert,
                             ConfigParam.Defaults.BandwidthOutAlert
+                        }
+                    },
+                    new MonitorConfig()
+                    {
+                        Type = MonitorType.Power,
+                        Enabled = true,
+                        Order = 0,
+                        Hardware = new HardwareConfig[0],
+                        Metrics = new MetricConfig[2]
+                        {
+                            new MetricConfig(MetricKey.SystemPower, true),
+                            new MetricConfig(MetricKey.SystemCurrent, true)
+                        },
+                        Params = new ConfigParam[4]
+                        {
+                            ConfigParam.Defaults.RoundAll,
+                            ConfigParam.Defaults.OtherWattage,
+                            ConfigParam.Defaults.PSUEfficiency,
+                            ConfigParam.Defaults.MainsVoltage
                         }
                     }
                 };
@@ -2403,6 +2901,15 @@ namespace SidebarDiagnostics.Monitoring
         GPUVoltage = 15,
         GPUTemp = 16,
         GPUFan = 17,
+        GPUFanRPM = 28,
+        GPUPower = 32,
+
+        CPUCoreMax = 29,
+        CPUPower = 30,
+        CPUCurrent = 31,
+
+        SystemPower = 33,
+        SystemCurrent = 34,
 
         NetworkIP = 26,
         NetworkExtIP = 27,
@@ -2545,6 +3052,15 @@ namespace SidebarDiagnostics.Monitoring
                     case ParamKey.UseGHz:
                         return Resources.SettingsUseGHz;
 
+                    case ParamKey.OtherWattage:
+                        return Resources.SettingsOtherWattage;
+
+                    case ParamKey.PSUEfficiency:
+                        return Resources.SettingsPSUEfficiency;
+
+                    case ParamKey.MainsVoltage:
+                        return Resources.SettingsMainsVoltage;
+
                     default:
                         return "Unknown";
                 }
@@ -2599,6 +3115,15 @@ namespace SidebarDiagnostics.Monitoring
                     case ParamKey.UseGHz:
                         return Resources.SettingsUseGHzTooltip;
 
+                    case ParamKey.OtherWattage:
+                        return Resources.SettingsOtherWattageTooltip;
+
+                    case ParamKey.PSUEfficiency:
+                        return Resources.SettingsPSUEfficiencyTooltip;
+
+                    case ParamKey.MainsVoltage:
+                        return Resources.SettingsMainsVoltageTooltip;
+
                     default:
                         return "Unknown";
                 }
@@ -2628,6 +3153,37 @@ namespace SidebarDiagnostics.Monitoring
                 get
                 {
                     return new ConfigParam() { Key = ParamKey.UseFahrenheit, Value = false };
+                }
+            }
+
+            /// <summary>
+            /// Everything that can't report its own draw: RAM, drives, fans, chipset and VRM
+            /// losses. 60 W suits a typical desktop; a minimal build or a drive-heavy one will want
+            /// this adjusted.
+            /// </summary>
+            public static ConfigParam OtherWattage
+            {
+                get
+                {
+                    return new ConfigParam() { Key = ParamKey.OtherWattage, Value = 60 };
+                }
+            }
+
+            /// <summary>PSU conversion efficiency as a percentage; 90% is typical for 80+ Gold at normal load.</summary>
+            public static ConfigParam PSUEfficiency
+            {
+                get
+                {
+                    return new ConfigParam() { Key = ParamKey.PSUEfficiency, Value = 90 };
+                }
+            }
+
+            /// <summary>Mains voltage, used to turn wall watts into amps. 220 V for most of the world, 110/120 V in North America and Japan.</summary>
+            public static ConfigParam MainsVoltage
+            {
+                get
+                {
+                    return new ConfigParam() { Key = ParamKey.MainsVoltage, Value = 220 };
                 }
             }
 
@@ -2745,7 +3301,10 @@ namespace SidebarDiagnostics.Monitoring
         RoundAll,
         DriveSpace,
         DriveIO,
-        UseGHz
+        UseGHz,
+        OtherWattage,
+        PSUEfficiency,
+        MainsVoltage
     }
 
     public enum DataType : byte
@@ -2774,7 +3333,9 @@ namespace SidebarDiagnostics.Monitoring
         RPM,
         Celcius,
         Fahrenheit,
-        IP
+        IP,
+        Watt,
+        Amp
     }
 
     public interface iConverter
@@ -3062,6 +3623,9 @@ namespace SidebarDiagnostics.Monitoring
                 case MonitorType.Network:
                     return Resources.Network;
 
+                case MonitorType.Power:
+                    return Resources.Power;
+
                 default:
                     throw new ArgumentException("Invalid MonitorType.");
             }
@@ -3129,6 +3693,27 @@ namespace SidebarDiagnostics.Monitoring
 
                 case MetricKey.GPUFan:
                     return Resources.GPUFan;
+
+                case MetricKey.GPUFanRPM:
+                    return Resources.GPUFanRPM;
+
+                case MetricKey.CPUCoreMax:
+                    return Resources.CPUCoreMax;
+
+                case MetricKey.CPUPower:
+                    return Resources.CPUPower;
+
+                case MetricKey.CPUCurrent:
+                    return Resources.CPUCurrent;
+
+                case MetricKey.GPUPower:
+                    return Resources.GPUPower;
+
+                case MetricKey.SystemPower:
+                    return Resources.SystemPower;
+
+                case MetricKey.SystemCurrent:
+                    return Resources.SystemCurrent;
 
                 case MetricKey.NetworkIP:
                     return Resources.NetworkIP;
@@ -3222,6 +3807,27 @@ namespace SidebarDiagnostics.Monitoring
 
                 case MetricKey.GPUFan:
                     return Resources.GPUFanLabel;
+
+                case MetricKey.GPUFanRPM:
+                    return Resources.GPUFanRPMLabel;
+
+                case MetricKey.CPUCoreMax:
+                    return Resources.CPUCoreMaxLabel;
+
+                case MetricKey.CPUPower:
+                    return Resources.CPUPowerLabel;
+
+                case MetricKey.CPUCurrent:
+                    return Resources.CPUCurrentLabel;
+
+                case MetricKey.GPUPower:
+                    return Resources.GPUPowerLabel;
+
+                case MetricKey.SystemPower:
+                    return Resources.SystemPowerLabel;
+
+                case MetricKey.SystemCurrent:
+                    return Resources.SystemCurrentLabel;
 
                 case MetricKey.NetworkIP:
                     return Resources.NetworkIPLabel;
@@ -3324,6 +3930,12 @@ namespace SidebarDiagnostics.Monitoring
 
                 case DataType.RPM:
                     return " RPM";
+
+                case DataType.Watt:
+                    return " W";
+
+                case DataType.Amp:
+                    return " A";
 
                 case DataType.Celcius:
                     return " C";

@@ -153,15 +153,9 @@
                                                         </ContentControl.Style>
                                                     </ContentControl>
                                                     
-                                                    <ItemsControl ItemsSource="{Binding Path=Metrics, Mode=OneWay}">
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate DataType="{x:Type monitor:iMetric}">
-                                                                <DockPanel Style="{StaticResource MetricPanel}">
-                                                                    <TextBlock Text="{Binding Path=Label, Mode=OneWay, Converter={StaticResource MetricLabelConverter}}" Style="{StaticResource MetricLabel}" />
-                                                                    <TextBlock Text="{Binding Path=Text, Mode=OneWay}" Style="{StaticResource MetricValue}" />
-                                                                </DockPanel>
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
+                                                    <!-- Supplied by the active layout dictionary (see LayoutManager), so the
+                                                         presentation of a reading can be swapped without touching this file. -->
+                                                    <ItemsControl ItemsSource="{Binding Path=Metrics, Mode=OneWay}" ItemTemplate="{DynamicResource MetricTemplate}">
                                                         <ItemsControl.ItemsPanel>
                                                             <ItemsPanelTemplate>
                                                                 <StackPanel Style="{StaticResource VerticalPanel}" />

@@ -29,9 +29,16 @@
         <conv:HotkeyToStringConverter x:Key="HotkeyConverter" />
     </Window.Resources>
     <DockPanel LastChildFill="True">
-        <StackPanel DockPanel.Dock="Bottom" Style="{StaticResource WindowButtons_SM}">
+        <!-- Reset is docked left, away from the confirm/dismiss group, so it can't be hit by
+             muscle memory aimed at Save. -->
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="15">
+            <Button DockPanel.Dock="Left" VerticalAlignment="Bottom" Margin="0"
+                    Content="{x:Static frame:Resources.SettingsResetAll}"
+                    ToolTip="{x:Static frame:Resources.SettingsResetAllTooltip}"
+                    Click="ResetDefaultsButton_Click" Style="{StaticResource NeutralButton_SM}" />
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Bottom">
             <Button Content="{x:Static frame:Resources.ButtonSave}" Click="SaveButton_Click" Style="{StaticResource WindowButton_SM}" />
-            <Button Content="{x:Static frame:Resources.ButtonApply}" IsEnabled="{Binding Path=IsChanged, Mode=OneWay}" Click="ApplyButton_Click" />
+            <Button Content="{x:Static frame:Resources.ButtonApply}" IsEnabled="{Binding Path=IsChanged, Mode=OneWay}" Click="ApplyButton_Click" Style="{StaticResource SecondaryButton_SM}" />
             <Button Click="CloseButton_Click">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource NeutralButton_SM}">
@@ -44,7 +51,8 @@
                     </Style>
                 </Button.Style>
             </Button>
-        </StackPanel>
+            </StackPanel>
+        </DockPanel>
         <TabControl Style="{StaticResource SettingTab}">
             <TabItem Header="{x:Static frame:Resources.SettingsGeneralTab}">
                 <Grid Style="{StaticResource SettingGrid}">
@@ -60,6 +68,7 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="38px"></RowDefinition>
                         <RowDefinition Height="38px"></RowDefinition>
                     </Grid.RowDefinitions>
 
@@ -86,6 +95,9 @@
 
                     <Label Grid.Column="0" Grid.Row="7" Content="{x:Static frame:Resources.SettingsTheme}" />
                     <ComboBox Grid.Column="1" Grid.Row="7" ItemsSource="{Binding Path=ThemeItems, Mode=OneWay}" DisplayMemberPath="Text" SelectedValuePath="Value" SelectedValue="{Binding Path=Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsThemeTooltip}" />
+
+                    <Label Grid.Column="0" Grid.Row="8" Content="{x:Static frame:Resources.SettingsLayout}" />
+                    <ComboBox Grid.Column="1" Grid.Row="8" ItemsSource="{Binding Path=LayoutItems, Mode=OneWay}" SelectedItem="{Binding Path=Layout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ToolTip="{x:Static frame:Resources.SettingsLayoutTooltip}" />
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static frame:Resources.SettingsAdvancedTab}">
@@ -219,6 +231,19 @@
             </TabItem>
             <TabItem Header="{x:Static frame:Resources.SettingsMonitorsTab}">
                 <StackPanel Style="{StaticResource VerticalPanel}">
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0"
+                               Content="{x:Static frame:Resources.SettingsPreset}" />
+                        <ComboBox Grid.Column="1" VerticalAlignment="Center"
+                                  ItemsSource="{Binding Path=PresetItems, Mode=OneWay}"
+                                  DisplayMemberPath="Text" SelectedValuePath="Value"
+                                  SelectedValue="{Binding Path=MetricPreset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="{x:Static frame:Resources.SettingsPresetTooltip}" />
+                    </Grid>
                     <StackPanel Style="{StaticResource SettingTitle}">
                         <TextBlock Text="{x:Static frame:Resources.SettingsMonitorsSubtitle1}" />
                         <TextBlock Text="{x:Static frame:Resources.SettingsMonitorsSubtitle2}" />

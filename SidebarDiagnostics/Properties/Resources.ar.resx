@@ -805,6 +805,154 @@
     <value>اختر مجموعة ألوان جاهزة للشريط الجانبي ونوافذ التطبيق. يمكنك تعديل الألوان يدويًا لاحقًا من تبويب التخصيص.</value>
     <comment>Settings theme tooltip</comment>
   </data>
+  <data name="SettingsResetAll" xml:space="preserve">
+    <value>استعادة الإعدادات الافتراضية</value>
+    <comment>Settings reset all button</comment>
+  </data>
+  <data name="SettingsResetAllTooltip" xml:space="preserve">
+    <value>يعيد جميع الإعدادات - التخطيط والمظهر والألوان والخطوط والمستشعرات والاختصارات - إلى وضعها الافتراضي.</value>
+    <comment>Settings reset all tooltip</comment>
+  </data>
+  <data name="SettingsResetAllConfirm" xml:space="preserve">
+    <value>هل تريد إعادة جميع الإعدادات إلى وضعها الافتراضي؟
+
+سيعيد ذلك التخطيط والمظهر والألوان والخطوط واختيار المستشعرات والاختصارات. لا يمكن التراجع عن هذا الإجراء.</value>
+    <comment>Settings reset all confirmation</comment>
+  </data>
+  <data name="DriverPromptTitle" xml:space="preserve">
+    <value>تعريف مستشعرات العتاد</value>
+    <comment>Title of the PawnIO driver install prompt</comment>
+  </data>
+  <data name="DriverPromptText" xml:space="preserve">
+    <value>تحتاج قراءات حرارة المعالج وترددات الأنوية ومراوح اللوحة الأم إلى تعريف PawnIO، وهو غير مثبّت حاليًا.
+
+بدونه ستظهر هذه القراءات بقيمة 0، أما بقية القراءات فتعمل بشكل طبيعي.
+
+هل تريد تثبيته الآن؟ (مرفق مع التطبيق، لا يحتاج تنزيلًا)</value>
+    <comment>Body of the PawnIO driver install prompt</comment>
+  </data>
+  <data name="DriverFailedText" xml:space="preserve">
+    <value>تعذّر تثبيت التعريف. ستظهر حرارة المعالج وترددات الأنوية بقيمة 0.
+
+يمكنك تثبيته يدويًا من https://pawnio.eu ثم إعادة تشغيل التطبيق.</value>
+    <comment>Shown when the PawnIO driver install fails</comment>
+  </data>
+  <data name="GPUFanRPM" xml:space="preserve">
+    <value>سرعة المروحة (دورة/دقيقة)</value>
+    <comment>Full name for GPU fan RPM metric</comment>
+  </data>
+  <data name="GPUFanRPMLabel" xml:space="preserve">
+    <value>دورة المروحة</value>
+    <comment>Short label for GPU fan RPM metric</comment>
+  </data>
+  <data name="SettingsLayout" xml:space="preserve">
+    <value>التخطيط</value>
+    <comment>Settings label for the metric layout selector</comment>
+  </data>
+  <data name="SettingsLayoutTooltip" xml:space="preserve">
+    <value>طريقة عرض كل قراءة. ضع ملف ‎.xaml‎ خاصًا بك في مجلد Layouts بجانب settings.json ليظهر هنا.</value>
+    <comment>Tooltip for the metric layout selector</comment>
+  </data>
+  <data name="SettingsPreset" xml:space="preserve">
+    <value>النمط الجاهز</value>
+    <comment>Settings label for the metric preset selector</comment>
+  </data>
+  <data name="SettingsPresetTooltip" xml:space="preserve">
+    <value>يختار مجموعة جاهزة من القراءات. تحديد أي خيار بالأسفل يحوّل هذا إلى "مخصص".</value>
+    <comment>Tooltip for the metric preset selector</comment>
+  </data>
+  <data name="PresetSimple" xml:space="preserve">
+    <value>بسيط</value>
+    <comment>Name of the simple metric preset</comment>
+  </data>
+  <data name="PresetGamer" xml:space="preserve">
+    <value>الألعاب</value>
+    <comment>Name of the gamer metric preset</comment>
+  </data>
+  <data name="PresetAdvanced" xml:space="preserve">
+    <value>متقدم</value>
+    <comment>Name of the advanced metric preset</comment>
+  </data>
+  <data name="PresetCustom" xml:space="preserve">
+    <value>مخصص</value>
+    <comment>Name of the custom metric preset</comment>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>الطاقة</value>
+    <comment>Name of the power monitor panel</comment>
+  </data>
+  <data name="SystemPower" xml:space="preserve">
+    <value>طاقة النظام (تقديري)</value>
+    <comment>Full name for estimated whole-system power metric</comment>
+  </data>
+  <data name="SystemPowerLabel" xml:space="preserve">
+    <value>الإجمالي</value>
+    <comment>Short label for estimated whole-system power metric</comment>
+  </data>
+  <data name="SystemCurrent" xml:space="preserve">
+    <value>تيار الكهرباء (تقديري)</value>
+    <comment>Full name for estimated mains current metric</comment>
+  </data>
+  <data name="SystemCurrentLabel" xml:space="preserve">
+    <value>التيار</value>
+    <comment>Short label for estimated mains current metric</comment>
+  </data>
+  <data name="SettingsOtherWattage" xml:space="preserve">
+    <value>المكونات الأخرى (واط)</value>
+    <comment>Settings label for the estimated non-measurable wattage</comment>
+  </data>
+  <data name="SettingsOtherWattageTooltip" xml:space="preserve">
+    <value>استهلاك تقديري للمكونات التي لا تستطيع قياس طاقتها: الذاكرة والأقراص والمراوح وشرائح اللوحة وفواقد التنظيم. المعالج وكرت الشاشة يُقاسان فعليًا ولا يدخلان هنا. حوالي 60 واط مناسبة لجهاز مكتبي معتاد.</value>
+    <comment>Tooltip for the other components wattage setting</comment>
+  </data>
+  <data name="SettingsPSUEfficiency" xml:space="preserve">
+    <value>كفاءة مزود الطاقة (%)</value>
+    <comment>Settings label for power supply efficiency</comment>
+  </data>
+  <data name="SettingsPSUEfficiencyTooltip" xml:space="preserve">
+    <value>نسبة الطاقة المسحوبة من الكهرباء التي تصل فعليًا إلى المكونات، والباقي يُفقد حرارةً داخل مزود الطاقة. 90% نسبة معتادة لمزود بتصنيف 80+ Gold.</value>
+    <comment>Tooltip for the PSU efficiency setting</comment>
+  </data>
+  <data name="SettingsMainsVoltage" xml:space="preserve">
+    <value>جهد الكهرباء (فولت)</value>
+    <comment>Settings label for mains voltage</comment>
+  </data>
+  <data name="SettingsMainsVoltageTooltip" xml:space="preserve">
+    <value>جهد الكهرباء في المنزل، ويُستخدم لتحويل الواط إلى أمبير. 220-240 فولت في معظم دول العالم، و110-120 فولت في أمريكا الشمالية واليابان.</value>
+    <comment>Tooltip for the mains voltage setting</comment>
+  </data>
+  <data name="CPUPower" xml:space="preserve">
+    <value>استهلاك الطاقة</value>
+    <comment>Full name for CPU package power metric</comment>
+  </data>
+  <data name="CPUPowerLabel" xml:space="preserve">
+    <value>الطاقة</value>
+    <comment>Short label for CPU package power metric</comment>
+  </data>
+  <data name="CPUCurrent" xml:space="preserve">
+    <value>شدة التيار</value>
+    <comment>Full name for CPU current metric</comment>
+  </data>
+  <data name="CPUCurrentLabel" xml:space="preserve">
+    <value>التيار</value>
+    <comment>Short label for CPU current metric</comment>
+  </data>
+  <data name="GPUPower" xml:space="preserve">
+    <value>استهلاك الطاقة</value>
+    <comment>Full name for GPU power metric</comment>
+  </data>
+  <data name="GPUPowerLabel" xml:space="preserve">
+    <value>الطاقة</value>
+    <comment>Short label for GPU power metric</comment>
+  </data>
+  <data name="CPUCoreMax" xml:space="preserve">
+    <value>أعلى نواة استخدامًا</value>
+    <comment>Full name for CPU busiest core load metric</comment>
+  </data>
+  <data name="CPUCoreMaxLabel" xml:space="preserve">
+    <value>أقصى نواة</value>
+    <comment>Short label for CPU busiest core load metric</comment>
+  </data>
   <data name="SettingsResetColors" xml:space="preserve">
     <value>إعادة تعيين الألوان</value>
     <comment>Settings reset colors button</comment>

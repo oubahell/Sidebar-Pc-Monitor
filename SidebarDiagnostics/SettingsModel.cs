@@ -47,6 +47,14 @@ namespace SidebarDiagnostics.Models
 
             Theme = Framework.Settings.Instance.Theme;
 
+            // Rebuilt on every open so a layout file dropped into the folder while the app was
+            // running shows up without a restart.
+            LayoutItems = Framework.LayoutManager.GetAvailable();
+
+            Layout = LayoutItems.Contains(Framework.Settings.Instance.Layout, StringComparer.OrdinalIgnoreCase)
+                ? Framework.Settings.Instance.Layout
+                : Framework.LayoutManager.DEFAULT;
+
             Monitor[] _monitors = Monitor.GetMonitors();
 
             ScreenItems = _monitors.Select((s, i) => new ScreenItem() { Index = i, Text = string.Format("#{0}", i + 1) }).ToArray();
@@ -134,6 +142,18 @@ namespace SidebarDiagnostics.Models
 
             MonitorConfig = _config;
 
+            PresetItems = new PresetItem[4]
+            {
+                new PresetItem() { Value = MetricPreset.Simple, Text = Resources.PresetSimple },
+                new PresetItem() { Value = MetricPreset.Gamer, Text = Resources.PresetGamer },
+                new PresetItem() { Value = MetricPreset.Advanced, Text = Resources.PresetAdvanced },
+                new PresetItem() { Value = MetricPreset.Custom, Text = Resources.PresetCustom }
+            };
+
+            // Derived from the metrics themselves rather than trusting the stored value, so a config
+            // edited by hand (or carried over from an older build) still reports honestly.
+            _metricPreset = MetricPresets.Detect(_config);
+
             if (Framework.Settings.Instance.Hotkeys != null)
             {
                 ToggleKey = Framework.Settings.Instance.Hotkeys.FirstOrDefault(k => k.Action == Hotkey.KeyAction.Toggle);
@@ -186,6 +206,8 @@ namespace SidebarDiagnostics.Models
             Framework.Settings.Instance.ShowMachineName = ShowMachineName;
             Framework.Settings.Instance.ShowClock = ShowClock;
             Framework.Settings.Instance.Clock24HR = Clock24HR;
+            Framework.Settings.Instance.MetricPreset = MetricPreset;
+            Framework.Settings.Instance.Layout = Layout;
 
             MonitorConfig[] _config = MonitorConfig.Select(c => c.Clone()).ToArray();
 
@@ -289,6 +311,16 @@ namespace SidebarDiagnostics.Models
         private void Child_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             IsChanged = true;
+
+            // Ticking a metric by hand may no longer match the chosen preset, so re-derive it and
+            // let the dropdown fall back to Custom rather than continuing to claim a preset that
+            // no longer describes the selection.
+            if (!_applyingPreset && (sender is MetricConfig || sender is MonitorConfig) && string.Equals(e.PropertyName, "Enabled", StringComparison.Ordinal))
+            {
+                _metricPreset = MetricPresets.Detect(_monitorConfig);
+
+                NotifyPropertyChanged("MetricPreset");
+            }
         }
 
         private void Child_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -375,6 +407,38 @@ namespace SidebarDiagnostics.Models
             BGOpacity = _preset.BGOpacity;
             FontColor = _preset.FontColor;
             AlertFontColor = _preset.AlertFontColor;
+        }
+
+        private string _layout { get; set; }
+
+        public string Layout
+        {
+            get
+            {
+                return _layout;
+            }
+            set
+            {
+                _layout = value;
+
+                NotifyPropertyChanged("Layout");
+            }
+        }
+
+        private string[] _layoutItems { get; set; }
+
+        public string[] LayoutItems
+        {
+            get
+            {
+                return _layoutItems;
+            }
+            set
+            {
+                _layoutItems = value;
+
+                NotifyPropertyChanged("LayoutItems");
+            }
         }
 
         private ThemeItem[] _themeItems { get; set; }
@@ -921,6 +985,57 @@ namespace SidebarDiagnostics.Models
             }
         }
 
+        /// <summary>Guards the preset-applied metric writes from being read back as a manual edit.</summary>
+        private bool _applyingPreset { get; set; } = false;
+
+        private MetricPreset _metricPreset { get; set; }
+
+        public MetricPreset MetricPreset
+        {
+            get
+            {
+                return _metricPreset;
+            }
+            set
+            {
+                _metricPreset = value;
+
+                if (value != MetricPreset.Custom && _monitorConfig != null)
+                {
+                    _applyingPreset = true;
+
+                    try
+                    {
+                        MetricPresets.Apply(_monitorConfig, value);
+                    }
+                    finally
+                    {
+                        _applyingPreset = false;
+                    }
+
+                    IsChanged = true;
+                }
+
+                NotifyPropertyChanged("MetricPreset");
+            }
+        }
+
+        private PresetItem[] _presetItems { get; set; }
+
+        public PresetItem[] PresetItems
+        {
+            get
+            {
+                return _presetItems;
+            }
+            set
+            {
+                _presetItems = value;
+
+                NotifyPropertyChanged("PresetItems");
+            }
+        }
+
         private ObservableCollection<MonitorConfig> _monitorConfig { get; set; }
 
         public ObservableCollection<MonitorConfig> MonitorConfig
@@ -1100,6 +1215,13 @@ namespace SidebarDiagnostics.Models
     public class ThemeItem
     {
         public ThemeKind Value { get; set; }
+
+        public string Text { get; set; }
+    }
+
+    public class PresetItem
+    {
+        public MetricPreset Value { get; set; }
 
         public string Text { get; set; }
     }

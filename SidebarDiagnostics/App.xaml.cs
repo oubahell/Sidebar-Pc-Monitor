@@ -51,6 +51,17 @@ namespace SidebarDiagnostics
             // THEME
             ApplyTheme(Framework.Settings.Instance.Theme);
 
+            // LAYOUT
+            // Applied before the sidebar is built so the metric rows render in the chosen layout
+            // from the first frame rather than flashing the default first.
+            Framework.LayoutManager.Apply(Framework.Settings.Instance.Layout);
+
+            // HARDWARE ACCESS DRIVER
+            // Must run before the first MonitorManager is built: LibreHardwareMonitor probes for
+            // PawnIO when it opens the Computer, so installing it afterwards would leave every
+            // CPU-sourced reading (temperature, clocks, package power) stuck at zero until restart.
+            CheckPawnIO();
+
             // VERSION
             Version _version = Assembly.GetExecutingAssembly().GetName().Version;
             string _vstring = _version.ToString(3);
@@ -99,6 +110,45 @@ namespace SidebarDiagnostics
         public static void RefreshIcon()
         {
             TrayIcon.Visibility = Framework.Settings.Instance.ShowTrayIcon ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        /// <summary>
+        /// Installs the bundled PawnIO driver if it's missing, asking first, since installing a
+        /// kernel driver isn't something to do silently behind the user's back. Declining is
+        /// remembered so this only ever asks once.
+        /// </summary>
+        private static void CheckPawnIO()
+        {
+            if (PawnIOSetup.IsInstalled || Framework.Settings.Instance.SkipDriverPrompt)
+            {
+                return;
+            }
+
+            MessageBoxResult _result = MessageBox.Show(
+                Framework.Resources.DriverPromptText,
+                Framework.Resources.DriverPromptTitle,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.Yes,
+                MessageBoxOptions.DefaultDesktopOnly);
+
+            if (_result != MessageBoxResult.Yes)
+            {
+                Framework.Settings.Instance.SkipDriverPrompt = true;
+                Framework.Settings.Instance.Save();
+                return;
+            }
+
+            if (!PawnIOSetup.Install())
+            {
+                MessageBox.Show(
+                    Framework.Resources.DriverFailedText,
+                    Framework.Resources.DriverPromptTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.OK,
+                    MessageBoxOptions.DefaultDesktopOnly);
+            }
         }
 
         public static void ApplyTheme(Framework.ThemeKind theme)

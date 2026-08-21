@@ -1,0 +1,35 @@
+<ResourceDictionary
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:monitor="clr-namespace:SidebarDiagnostics.Monitoring">
+
+    <!--
+        Classic - the original presentation: label on the left, value on the right.
+
+        Every layout must provide a DataTemplate keyed "MetricTemplate". The sidebar binds its rows
+        to it as a DynamicResource, so this file alone decides how a reading is drawn. The bound
+        object is a monitor:iMetric, which exposes:
+
+            Label      - short name, e.g. "Temp"
+            FullName   - long name, e.g. "Temperature"
+            Text       - formatted value including units, e.g. "49 C"
+            Value      - the raw number, for bars and gauges
+            Append     - the unit string on its own, e.g. " C"
+            IsPercent  - true when Value is a 0-100 percentage, so a bar is meaningful
+            IsAlert    - true when the reading has crossed its configured alert threshold
+            AlertColor - the colour configured for an alerting reading
+
+        Styles and brushes are referenced with DynamicResource so they resolve against the running
+        app (and follow the active theme) no matter what order dictionaries were merged in.
+
+        To write your own, copy this file into the Layouts folder next to settings.json, rename it,
+        and edit freely - it is loaded at startup, no rebuild needed.
+    -->
+    <DataTemplate x:Key="MetricTemplate" DataType="{x:Type monitor:iMetric}">
+        <DockPanel Style="{DynamicResource MetricPanel}">
+            <TextBlock Text="{Binding Path=Label, Mode=OneWay, StringFormat={}{0}:}" Style="{DynamicResource MetricLabel}" />
+            <TextBlock Text="{Binding Path=Text, Mode=OneWay}" Style="{DynamicResource MetricValue}" />
+        </DockPanel>
+    </DataTemplate>
+
+</ResourceDictionary>

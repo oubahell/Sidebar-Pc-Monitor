@@ -285,6 +285,8 @@
     <Compile Include="Controls\ColorPickerBox.xaml.cs">
       <DependentUpon>ColorPickerBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PawnIOSetup.cs" />
+    <Compile Include="LayoutManager.cs" />
     <Compile Include="FlatStyle.xaml.cs">
       <DependentUpon>FlatStyle.xaml</DependentUpon>
     </Compile>
@@ -325,6 +327,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ColorPickerBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Layouts\Classic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Layouts\Compact.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Layouts\Bars.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Layouts\Tiles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -381,6 +399,9 @@
     <Resource Include="Sidebar.ico" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Bundled so the driver ships with the app instead of being a separate download the user
+         has to find. See PawnIOSetup.cs and NOTICE.md. -->
+    <EmbeddedResource Include="Resources\PawnIO_setup.exe" />
     <EmbeddedResource Include="Properties\Resources.ar.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.ar.Designer.cs</LastGenOutput>

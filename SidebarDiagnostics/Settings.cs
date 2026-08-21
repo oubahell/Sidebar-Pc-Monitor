@@ -33,6 +33,67 @@ namespace SidebarDiagnostics.Framework
             _instance = Load();
         }
 
+        /// <summary>
+        /// Restores every user-facing preference to its shipped default.
+        ///
+        /// This assigns through the public setters on the existing instance rather than swapping in
+        /// a fresh one, because the XAML binds to <see cref="Instance"/> via x:Static -- replacing
+        /// the singleton would leave every binding pointing at the discarded object. Going through
+        /// the setters also raises PropertyChanged so the sidebar updates in place.
+        ///
+        /// Bookkeeping that isn't a preference is deliberately preserved: ChangeLog (so the release
+        /// notes don't reappear), InitialSetup (so the first-run wizard doesn't re-trigger) and
+        /// SkipDriverPrompt (so a declined driver install isn't asked again).
+        /// </summary>
+        public void Reset()
+        {
+            DockEdge = DockEdge.Right;
+            ScreenIndex = 0;
+            Culture = Utilities.Culture.DEFAULT;
+            AutoUpdate = false;
+            RunAtStartup = true;
+
+            UIScale = 1d;
+            XOffset = 0;
+            YOffset = 0;
+            PollingInterval = 1000;
+            UseAppBar = true;
+            AlwaysTop = true;
+            ToolbarMode = true;
+            ClickThrough = false;
+            ShowTrayIcon = true;
+            CollapseMenuBar = false;
+            InitiallyHidden = false;
+
+            SidebarWidth = 180;
+            TextAlign = TextAlign.Left;
+            FontSetting = FontSetting.x14;
+            AlertBlink = true;
+            ShowMachineName = false;
+            ShowClock = true;
+            Clock24HR = false;
+            DateSetting = DateSetting.Short;
+
+            // Colours come from the default theme's preset so the two can't drift apart.
+            Theme = ThemeKind.HighContrastDark;
+
+            ThemePreset _preset = ThemePreset.Get(Theme);
+
+            AutoBGColor = false;
+            BGColor = _preset.BGColor;
+            BGOpacity = _preset.BGOpacity;
+            FontColor = _preset.FontColor;
+            AlertFontColor = _preset.AlertFontColor;
+
+            // Rebuilt through CheckConfig rather than being set to null. Null does regenerate the
+            // layout, but only when CheckConfig runs at startup -- and the Settings dialog rebuilds
+            // its view model immediately after a reset, which would read the null and throw.
+            MonitorConfig = SidebarDiagnostics.Monitoring.MonitorConfig.CheckConfig(null);
+            MetricPreset = MetricPreset.Simple;
+            Layout = LayoutManager.DEFAULT;
+            Hotkeys = new Hotkey[0];
+        }
+
         private static Settings Load()
         {
             Settings _return = null;
@@ -191,6 +252,67 @@ namespace SidebarDiagnostics.Framework
                 _theme = value;
 
                 NotifyPropertyChanged("Theme");
+            }
+        }
+
+        private string _layout { get; set; } = LayoutManager.DEFAULT;
+
+        /// <summary>
+        /// Name of the layout that decides how each reading is drawn. Stored by name rather than as
+        /// an enum so user-authored layouts, which the app can't know about ahead of time, are
+        /// selectable on the same footing as the built-in ones.
+        /// </summary>
+        [JsonProperty]
+        public string Layout
+        {
+            get
+            {
+                return _layout;
+            }
+            set
+            {
+                _layout = value;
+
+                NotifyPropertyChanged("Layout");
+            }
+        }
+
+        private MetricPreset _metricPreset { get; set; } = MetricPreset.Simple;
+
+        /// <summary>
+        /// Which curated metric set is active. Persisted only so the Settings dropdown opens on the
+        /// right entry -- the metric checkboxes themselves remain the source of truth.
+        /// </summary>
+        [JsonProperty]
+        public MetricPreset MetricPreset
+        {
+            get
+            {
+                return _metricPreset;
+            }
+            set
+            {
+                _metricPreset = value;
+
+                NotifyPropertyChanged("MetricPreset");
+            }
+        }
+
+        private bool _skipDriverPrompt { get; set; } = false;
+
+        /// <summary>Set once the user declines the PawnIO driver install, so we never ask again.</summary>
+        [JsonProperty]
+        public bool SkipDriverPrompt
+        {
+            get
+            {
+                return _skipDriverPrompt;
+            }
+            set
+            {
+                _skipDriverPrompt = value;
+
+                NotifyPropertyChanged("SkipDriverPrompt");
             }
         }
 

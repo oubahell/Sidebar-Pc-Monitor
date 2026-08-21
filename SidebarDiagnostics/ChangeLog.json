@@ -1,5 +1,19 @@
 ﻿[
 	{
+		"Version": "4.0.1",
+		"Changes": [
+			"CPU temperature, clocks and voltages now work: the PawnIO driver is bundled and installed on first run.",
+			"New Power panel with estimated whole-system wattage and mains current.",
+			"New readings: CPU power and current, GPU power, GPU fan RPM, busiest CPU core.",
+			"Metric presets: Simple, Gamer, Advanced and Custom.",
+			"Metric layouts: Classic, Compact, Bars and Tiles, plus support for your own.",
+			"Fixed the blank gap between RAM and GPU (Virtual Memory showed nothing).",
+			"Fixed per-core CPU rows showing one row too many, mislabelled.",
+			"Fixed a crash when resetting all settings to defaults.",
+			"Added a Reset to Defaults button."
+		]
+	},
+	{
 		"Version": "4.0.0",
 		"Changes": [
 			"Rebranded as Sidebar Pc Monitor.",

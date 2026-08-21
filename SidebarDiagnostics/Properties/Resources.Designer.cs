@@ -563,7 +563,322 @@ namespace SidebarDiagnostics.Framework {
                 return ResourceManager.GetString("GPUFanLabel", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reset to Defaults.
+        /// </summary>
+        public static string SettingsResetAll {
+            get {
+                return ResourceManager.GetString("SettingsResetAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string describing what Reset to Defaults restores.
+        /// </summary>
+        public static string SettingsResetAllTooltip {
+            get {
+                return ResourceManager.GetString("SettingsResetAllTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string asking to confirm resetting all settings.
+        /// </summary>
+        public static string SettingsResetAllConfirm {
+            get {
+                return ResourceManager.GetString("SettingsResetAllConfirm", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hardware Sensor Driver.
+        /// </summary>
+        public static string DriverPromptTitle {
+            get {
+                return ResourceManager.GetString("DriverPromptTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string asking whether to install the PawnIO driver.
+        /// </summary>
+        public static string DriverPromptText {
+            get {
+                return ResourceManager.GetString("DriverPromptText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string shown when the PawnIO driver install fails.
+        /// </summary>
+        public static string DriverFailedText {
+            get {
+                return ResourceManager.GetString("DriverFailedText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fan Speed (RPM).
+        /// </summary>
+        public static string GPUFanRPM {
+            get {
+                return ResourceManager.GetString("GPUFanRPM", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Fan RPM.
+        /// </summary>
+        public static string GPUFanRPMLabel {
+            get {
+                return ResourceManager.GetString("GPUFanRPMLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Layout.
+        /// </summary>
+        public static string SettingsLayout {
+            get {
+                return ResourceManager.GetString("SettingsLayout", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string describing the metric layout selector.
+        /// </summary>
+        public static string SettingsLayoutTooltip {
+            get {
+                return ResourceManager.GetString("SettingsLayoutTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Preset.
+        /// </summary>
+        public static string SettingsPreset {
+            get {
+                return ResourceManager.GetString("SettingsPreset", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string describing the metric preset selector.
+        /// </summary>
+        public static string SettingsPresetTooltip {
+            get {
+                return ResourceManager.GetString("SettingsPresetTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Simple.
+        /// </summary>
+        public static string PresetSimple {
+            get {
+                return ResourceManager.GetString("PresetSimple", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Gamer.
+        /// </summary>
+        public static string PresetGamer {
+            get {
+                return ResourceManager.GetString("PresetGamer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced.
+        /// </summary>
+        public static string PresetAdvanced {
+            get {
+                return ResourceManager.GetString("PresetAdvanced", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Custom.
+        /// </summary>
+        public static string PresetCustom {
+            get {
+                return ResourceManager.GetString("PresetCustom", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Power.
+        /// </summary>
+        public static string Power {
+            get {
+                return ResourceManager.GetString("Power", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to System Power (est.).
+        /// </summary>
+        public static string SystemPower {
+            get {
+                return ResourceManager.GetString("SystemPower", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        public static string SystemPowerLabel {
+            get {
+                return ResourceManager.GetString("SystemPowerLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mains Current (est.).
+        /// </summary>
+        public static string SystemCurrent {
+            get {
+                return ResourceManager.GetString("SystemCurrent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mains.
+        /// </summary>
+        public static string SystemCurrentLabel {
+            get {
+                return ResourceManager.GetString("SystemCurrentLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Other Components (W).
+        /// </summary>
+        public static string SettingsOtherWattage {
+            get {
+                return ResourceManager.GetString("SettingsOtherWattage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string describing the other-components wattage estimate.
+        /// </summary>
+        public static string SettingsOtherWattageTooltip {
+            get {
+                return ResourceManager.GetString("SettingsOtherWattageTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to PSU Efficiency (%).
+        /// </summary>
+        public static string SettingsPSUEfficiency {
+            get {
+                return ResourceManager.GetString("SettingsPSUEfficiency", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string describing PSU efficiency.
+        /// </summary>
+        public static string SettingsPSUEfficiencyTooltip {
+            get {
+                return ResourceManager.GetString("SettingsPSUEfficiencyTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mains Voltage (V).
+        /// </summary>
+        public static string SettingsMainsVoltage {
+            get {
+                return ResourceManager.GetString("SettingsMainsVoltage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string describing mains voltage.
+        /// </summary>
+        public static string SettingsMainsVoltageTooltip {
+            get {
+                return ResourceManager.GetString("SettingsMainsVoltageTooltip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Power Draw.
+        /// </summary>
+        public static string CPUPower {
+            get {
+                return ResourceManager.GetString("CPUPower", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Power.
+        /// </summary>
+        public static string CPUPowerLabel {
+            get {
+                return ResourceManager.GetString("CPUPowerLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Current Draw.
+        /// </summary>
+        public static string CPUCurrent {
+            get {
+                return ResourceManager.GetString("CPUCurrent", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Current.
+        /// </summary>
+        public static string CPUCurrentLabel {
+            get {
+                return ResourceManager.GetString("CPUCurrentLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Power Draw.
+        /// </summary>
+        public static string GPUPower {
+            get {
+                return ResourceManager.GetString("GPUPower", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Power.
+        /// </summary>
+        public static string GPUPowerLabel {
+            get {
+                return ResourceManager.GetString("GPUPowerLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Busiest Core.
+        /// </summary>
+        public static string CPUCoreMax {
+            get {
+                return ResourceManager.GetString("CPUCoreMax", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Core Max.
+        /// </summary>
+        public static string CPUCoreMaxLabel {
+            get {
+                return ResourceManager.GetString("CPUCoreMaxLabel", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Temperature.
         /// </summary>

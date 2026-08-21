@@ -316,6 +316,154 @@
     <value>Fan</value>
     <comment>Short label for GPU voltage metric</comment>
   </data>
+  <data name="SettingsResetAll" xml:space="preserve">
+    <value>Reset to Defaults</value>
+    <comment>Settings reset all button</comment>
+  </data>
+  <data name="SettingsResetAllTooltip" xml:space="preserve">
+    <value>Restores every setting - layout, theme, colors, fonts, monitors and hotkeys - to its original default.</value>
+    <comment>Settings reset all tooltip</comment>
+  </data>
+  <data name="SettingsResetAllConfirm" xml:space="preserve">
+    <value>Reset every setting back to its default?
+
+This restores the layout, theme, colors, fonts, monitor selection and hotkeys. It cannot be undone.</value>
+    <comment>Settings reset all confirmation</comment>
+  </data>
+  <data name="DriverPromptTitle" xml:space="preserve">
+    <value>Hardware Sensor Driver</value>
+    <comment>Title of the PawnIO driver install prompt</comment>
+  </data>
+  <data name="DriverPromptText" xml:space="preserve">
+    <value>CPU temperature, core clocks and motherboard fan sensors need the PawnIO driver, which isn't installed yet.
+
+Without it those readings will show as 0. Everything else keeps working.
+
+Install it now? (included with this app, no download needed)</value>
+    <comment>Body of the PawnIO driver install prompt</comment>
+  </data>
+  <data name="DriverFailedText" xml:space="preserve">
+    <value>The driver could not be installed. CPU temperature and clock readings will show as 0.
+
+You can install it manually from https://pawnio.eu and restart the app.</value>
+    <comment>Shown when the PawnIO driver install fails</comment>
+  </data>
+  <data name="GPUFanRPM" xml:space="preserve">
+    <value>Fan Speed (RPM)</value>
+    <comment>Full name for GPU fan RPM metric</comment>
+  </data>
+  <data name="GPUFanRPMLabel" xml:space="preserve">
+    <value>Fan RPM</value>
+    <comment>Short label for GPU fan RPM metric</comment>
+  </data>
+  <data name="SettingsLayout" xml:space="preserve">
+    <value>Layout</value>
+    <comment>Settings label for the metric layout selector</comment>
+  </data>
+  <data name="SettingsLayoutTooltip" xml:space="preserve">
+    <value>How each reading is drawn. Drop your own .xaml layout into the Layouts folder beside settings.json and it appears here.</value>
+    <comment>Tooltip for the metric layout selector</comment>
+  </data>
+  <data name="SettingsPreset" xml:space="preserve">
+    <value>Preset</value>
+    <comment>Settings label for the metric preset selector</comment>
+  </data>
+  <data name="SettingsPresetTooltip" xml:space="preserve">
+    <value>Picks a ready-made set of readings. Ticking anything below switches this to Custom.</value>
+    <comment>Tooltip for the metric preset selector</comment>
+  </data>
+  <data name="PresetSimple" xml:space="preserve">
+    <value>Simple</value>
+    <comment>Name of the simple metric preset</comment>
+  </data>
+  <data name="PresetGamer" xml:space="preserve">
+    <value>Gamer</value>
+    <comment>Name of the gamer metric preset</comment>
+  </data>
+  <data name="PresetAdvanced" xml:space="preserve">
+    <value>Advanced</value>
+    <comment>Name of the advanced metric preset</comment>
+  </data>
+  <data name="PresetCustom" xml:space="preserve">
+    <value>Custom</value>
+    <comment>Name of the custom metric preset</comment>
+  </data>
+  <data name="Power" xml:space="preserve">
+    <value>Power</value>
+    <comment>Name of the power monitor panel</comment>
+  </data>
+  <data name="SystemPower" xml:space="preserve">
+    <value>System Power (est.)</value>
+    <comment>Full name for estimated whole-system power metric</comment>
+  </data>
+  <data name="SystemPowerLabel" xml:space="preserve">
+    <value>Total</value>
+    <comment>Short label for estimated whole-system power metric</comment>
+  </data>
+  <data name="SystemCurrent" xml:space="preserve">
+    <value>Mains Current (est.)</value>
+    <comment>Full name for estimated mains current metric</comment>
+  </data>
+  <data name="SystemCurrentLabel" xml:space="preserve">
+    <value>Mains</value>
+    <comment>Short label for estimated mains current metric</comment>
+  </data>
+  <data name="SettingsOtherWattage" xml:space="preserve">
+    <value>Other Components (W)</value>
+    <comment>Settings label for the estimated non-measurable wattage</comment>
+  </data>
+  <data name="SettingsOtherWattageTooltip" xml:space="preserve">
+    <value>Estimated draw of the parts that cannot report their own power: RAM, drives, fans, chipset and VRM losses. CPU and GPU are measured directly and are not included here. Around 60 W suits a typical desktop.</value>
+    <comment>Tooltip for the other components wattage setting</comment>
+  </data>
+  <data name="SettingsPSUEfficiency" xml:space="preserve">
+    <value>PSU Efficiency (%)</value>
+    <comment>Settings label for power supply efficiency</comment>
+  </data>
+  <data name="SettingsPSUEfficiencyTooltip" xml:space="preserve">
+    <value>How much of the power drawn from the wall reaches your components. The rest is lost as heat in the power supply. 90% is typical for an 80+ Gold unit at normal load.</value>
+    <comment>Tooltip for the PSU efficiency setting</comment>
+  </data>
+  <data name="SettingsMainsVoltage" xml:space="preserve">
+    <value>Mains Voltage (V)</value>
+    <comment>Settings label for mains voltage</comment>
+  </data>
+  <data name="SettingsMainsVoltageTooltip" xml:space="preserve">
+    <value>Your wall socket voltage, used to convert watts into amps. 220-240 V across most of the world, 110-120 V in North America and Japan.</value>
+    <comment>Tooltip for the mains voltage setting</comment>
+  </data>
+  <data name="CPUPower" xml:space="preserve">
+    <value>Power Draw</value>
+    <comment>Full name for CPU package power metric</comment>
+  </data>
+  <data name="CPUPowerLabel" xml:space="preserve">
+    <value>Power</value>
+    <comment>Short label for CPU package power metric</comment>
+  </data>
+  <data name="CPUCurrent" xml:space="preserve">
+    <value>Current Draw</value>
+    <comment>Full name for CPU current metric</comment>
+  </data>
+  <data name="CPUCurrentLabel" xml:space="preserve">
+    <value>Current</value>
+    <comment>Short label for CPU current metric</comment>
+  </data>
+  <data name="GPUPower" xml:space="preserve">
+    <value>Power Draw</value>
+    <comment>Full name for GPU power metric</comment>
+  </data>
+  <data name="GPUPowerLabel" xml:space="preserve">
+    <value>Power</value>
+    <comment>Short label for GPU power metric</comment>
+  </data>
+  <data name="CPUCoreMax" xml:space="preserve">
+    <value>Busiest Core</value>
+    <comment>Full name for CPU busiest core load metric</comment>
+  </data>
+  <data name="CPUCoreMaxLabel" xml:space="preserve">
+    <value>Core Max</value>
+    <comment>Short label for CPU busiest core load metric</comment>
+  </data>
   <data name="GPUTemp" xml:space="preserve">
     <value>Temperature</value>
     <comment>Full name for GPU temp metric</comment>
