@@ -41,11 +41,6 @@ namespace SidebarDiagnostics
             VelopackApp.Build()
                 .OnBeforeUninstallFastCallback(_v => CleanUp())
                 .Run();
-
-            // Run() returns only on an ordinary launch - it exits the process itself when it finds
-            // an installer hook. So by here we know this is the real app starting, and it needs
-            // administrator rights: LibreHardwareMonitor cannot open a single sensor without them.
-            Elevate();
         }
 
         /// <summary>
@@ -57,8 +52,13 @@ namespace SidebarDiagnostics
         /// launches the exe with CreateProcess to run its hooks, CreateProcess refuses to elevate,
         /// and the install fails without ever registering an uninstaller.
         ///
-        /// It has to come after VelopackApp.Run() for the same reason - the hooks must be able to
-        /// do their work in this un-elevated process and exit.
+        /// This belongs in OnStartup, not in the App constructor where it was first put. The
+        /// constructor runs before InitializeComponent, so App.xaml's resources do not exist yet -
+        /// and Process.Start with a "runas" verb goes through ShellExecuteEx, which pumps a nested
+        /// message loop. That pump let the queued startup work run early, and the first window it
+        /// opened died on "Cannot find resource named 'FlatWindowStyle'". By OnStartup the
+        /// resources are built, and the installer hooks in the constructor have already had their
+        /// un-elevated process to work in.
         ///
         /// The startup scheduled task runs the app elevated already, so a logon start goes straight
         /// past this with no prompt. A manual launch costs one UAC prompt, which is what the old
@@ -185,6 +185,10 @@ namespace SidebarDiagnostics
         protected async override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            // The app cannot read a single sensor without administrator rights, so get them before
+            // doing anything else. Exits this process when it relaunches, so nothing below runs.
+            Elevate();
 
             // ERROR HANDLING
             #if !DEBUG

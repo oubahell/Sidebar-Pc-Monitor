@@ -1,5 +1,11 @@
 ﻿[
 	{
+		"Version": "4.0.6",
+		"Changes": [
+			"Fixed the app crashing on startup with a \"Cannot find resource\" error."
+		]
+	},
+	{
 		"Version": "4.0.5",
 		"Changes": [
 			"Fixed the installer failing part way through and never registering an uninstall entry.",
