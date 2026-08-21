@@ -56,9 +56,13 @@ jobs:
           "version=$v" >> $env:GITHUB_OUTPUT
           Write-Host "Building $v"
 
+      # 9.x because LibreHardwareMonitor/global.json pins SDK 9.0.317; 8.x as well because the
+      # Velopack tool targets it and windows-latest is not guaranteed to carry that runtime.
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - uses: microsoft/setup-msbuild@v2
 
