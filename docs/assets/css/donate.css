@@ -1,0 +1,588 @@
+/*
+ * Sidebar Pc Monitor - donation page
+ *
+ * Palette follows the app's High-Contrast Dark theme so the page feels like a
+ * part of the product rather than a separate site.
+ */
+
+:root {
+  --bg:            #0b0d10;
+  --bg-raise:      #11151b;
+  --surface:       #161a21;
+  --surface-hover: #1c212a;
+  --border:        #262c36;
+  --border-strong: #333b47;
+
+  --text:          #e7eaf0;
+  --muted:         #97a1b0;
+
+  --accent:        #3b9dff;
+  --accent-strong: #1e7fe0;
+  --ok:            #35c07a;
+  --warn:          #f0a92f;
+
+  --radius:   14px;
+  --radius-sm: 9px;
+  --shadow: 0 12px 34px rgba(0, 0, 0, .45);
+
+  --wrap: 940px;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Belt and braces against sideways scroll on phones. A fixed-position
+     decoration is not clipped by overflow on body alone. */
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0 20px 64px;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* A single soft wash behind the header. Subtle enough to read as depth rather
+   than decoration, and pinned so it never affects layout. */
+.glow {
+  position: fixed;
+  top: -280px;
+  left: 0;
+  right: 0;
+  height: 620px;
+  background: radial-gradient(ellipse 900px 620px at 50% 50%, rgba(59, 157, 255, .16), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+main, .site-head, .site-foot { position: relative; z-index: 1; }
+
+a { color: var(--accent); }
+a:hover { color: #6cb6ff; }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #04121f;
+  padding: 10px 16px;
+  border-radius: 0 0 var(--radius-sm) 0;
+  font-weight: 600;
+}
+.skip-link:focus { left: 0; z-index: 10; }
+
+/* --------------------------------------------------------------- header */
+
+.site-head {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 22px 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 650;
+  letter-spacing: -.01em;
+}
+.brand img { border-radius: 8px; }
+.brand:hover { color: var(--text); }
+
+.ghost-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14.5px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+.ghost-link:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+
+/* ----------------------------------------------------------------- hero */
+
+.hero {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 46px 0 34px;
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0 0 14px;
+  font-size: clamp(30px, 6vw, 46px);
+  line-height: 1.15;
+  letter-spacing: -.025em;
+  font-weight: 700;
+}
+
+.lede {
+  margin: 0 auto;
+  max-width: 560px;
+  font-size: clamp(16px, 2.4vw, 18px);
+  color: #c3cbd8;
+}
+
+.hero-note {
+  margin: 16px auto 0;
+  max-width: 520px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+
+/* ----------------------------------------------------------------- tabs */
+
+.tabs {
+  max-width: var(--wrap);
+  margin: 0 auto 28px;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: var(--bg-raise);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.tab:hover { color: var(--text); background: var(--surface); }
+.tab.is-active {
+  background: var(--accent);
+  color: #04121f;
+}
+.tab__flag { font-size: 17px; line-height: 1; }
+
+/* ---------------------------------------------------------------- panel */
+
+.panel {
+  max-width: var(--wrap);
+  margin: 0 auto;
+  animation: rise .32s ease both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---------------------------------------------------------------- cards */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color .2s ease, transform .2s ease, background .2s ease;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+}
+
+.card--unset { opacity: .62; }
+.card--unset:hover { transform: none; }
+
+.card--crypto { padding: 22px; }
+.card--crypto:hover { transform: none; }
+
+.card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ticker {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+
+.card__sub {
+  margin: 3px 0 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.card__hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------- badges */
+
+.badge {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+.badge--muted {
+  background: rgba(151, 161, 176, .12);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* The network is the one thing a donor must not misread, so it gets the
+   loudest treatment on the page. */
+.badge--network {
+  background: rgba(240, 169, 47, .14);
+  color: #ffc768;
+  border: 1px solid rgba(240, 169, 47, .42);
+  font-size: 12.5px;
+  text-transform: uppercase;
+}
+
+.network-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(240, 169, 47, .09);
+  border: 1px solid rgba(240, 169, 47, .3);
+  color: #ffd79a;
+}
+.network-callout svg { flex: none; margin-top: 2px; }
+.network-callout p { margin: 0; font-size: 13.5px; }
+
+/* --------------------------------------------------------------- values */
+
+.value {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.value__text {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 13px;
+  background: #0d1116;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 14px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.value__text--block {
+  display: block;
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.value__text--unset { color: var(--muted); font-style: italic; }
+
+.field-label {
+  margin: 0 0 7px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* -------------------------------------------------------------- buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-raise);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, transform .12s ease, color .18s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.btn--copy { flex: none; }
+
+.btn--primary {
+  width: 100%;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #04121f;
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #fff;
+}
+
+.btn.is-copied,
+.btn--primary.is-copied {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #04140c;
+}
+
+/* ---------------------------------------------------------------- chips */
+
+.chips {
+  display: flex;
+  gap: 9px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 9px 15px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-raise);
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+.chip:hover { color: var(--text); border-color: var(--border-strong); }
+
+.chip.is-active {
+  border-color: var(--accent);
+  background: rgba(59, 157, 255, .1);
+  color: var(--text);
+}
+
+.chip__name { font-size: 14.5px; font-weight: 650; }
+.chip__net  { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; opacity: .8; }
+
+/* ----------------------------------------------------------------- crypto */
+
+.crypto-body {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 640px) {
+  .crypto-body { grid-template-columns: 190px 1fr; }
+}
+
+/* QR codes go on white. Scanners cope badly with inverted codes, and a donation
+   that fails to scan is a donation that does not happen. */
+.qr-plate {
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  /* Capped so the square does not become a huge blank panel when the column
+     goes full width on a phone. */
+  width: 100%;
+  max-width: 240px;
+  margin-inline: auto;
+}
+
+.qr-plate svg,
+.qr-plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.qr-plate--small { max-width: 150px; align-self: center; }
+
+.qr-plate.is-empty { background: var(--bg-raise); border: 1px dashed var(--border-strong); }
+
+.qr-failed {
+  margin: 0;
+  padding: 8px;
+  font-size: 12.5px;
+  color: #6b7688;
+  text-align: center;
+}
+.qr-plate.is-empty .qr-failed { color: var(--muted); }
+
+.crypto-detail { min-width: 0; }
+
+/* --------------------------------------------------------------- notice */
+
+.notice {
+  max-width: var(--wrap);
+  margin: 34px auto 0;
+  padding: 22px;
+  background: var(--bg-raise);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.notice h2 {
+  margin: 0 0 12px;
+  font-size: 15.5px;
+  font-weight: 650;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text);
+}
+
+.notice ul { margin: 0; padding-left: 20px; }
+.notice li { margin-bottom: 8px; font-size: 14px; color: #b4bdcb; }
+.notice li:last-child { margin-bottom: 0; }
+.notice strong { color: var(--text); }
+
+/* --------------------------------------------------------------- footer */
+
+.site-foot {
+  max-width: var(--wrap);
+  margin: 40px auto 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.site-foot p {
+  margin: 0 auto;
+  max-width: 620px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.foot-meta { margin-top: 14px; font-size: 12.5px; }
+.foot-meta a { color: var(--muted); text-decoration: none; }
+.foot-meta a:hover { color: var(--accent); text-decoration: underline; }
+
+/* ---------------------------------------------------------------- toast */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate(-50%, 20px);
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: #1d232c;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease, transform .22s ease;
+  z-index: 20;
+  max-width: calc(100vw - 40px);
+  text-align: center;
+}
+
+.toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+.toast--ok   { border-color: var(--ok);   color: #9df0c4; }
+.toast--warn { border-color: var(--warn); color: #ffd79a; }
+
+/* ------------------------------------------------------------ a11y bits */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .card:hover { transform: none; }
+}
+
+/* Small phones: keep the copy button beside the value rather than stacking,
+   but let the value wrap onto as many lines as it needs. */
+@media (max-width: 420px) {
+  body { padding-left: 14px; padding-right: 14px; }
+  .card { padding: 17px; }
+  .tab { padding: 11px 10px; font-size: 14px; }
+  .value { flex-direction: column; }
+  .btn--copy { width: 100%; }
+}

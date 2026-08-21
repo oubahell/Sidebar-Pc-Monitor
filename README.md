@@ -201,6 +201,10 @@ useful, go and star the original too.
 Sensor data comes from [**LibreHardwareMonitor**](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor),
 with kernel access via [**PawnIO**](https://pawnio.eu) by namazso.
 
+If the project is useful to you, there are a few ways to
+[support its development](https://oubahell.github.io/Sidebar-Pc-Monitor/donate.html) —
+entirely optional, and nothing is locked behind it.
+
 Maintained by **ObaiDa.A**.
 
 ## License

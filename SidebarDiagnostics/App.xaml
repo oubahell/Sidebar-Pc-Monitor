@@ -35,8 +35,7 @@
                             <MenuItem Header="{x:Static frame:Resources.ButtonHide}" Click="Hide_Click" />
                         </MenuItem>
                         <Separator />
-                        <!-- Donate stays hidden until a wallet address is configured. Shipping the
-                             menu item without one would send anyone who clicked it nowhere. -->
+                        <MenuItem Header="{x:Static frame:Resources.ButtonDonate}" Click="Donate_Click" />
                         <MenuItem Header="{x:Static frame:Resources.ButtonGitHub}" Click="GitHub_Click" />
                         <MenuItem Header="{x:Static frame:Resources.ButtonUpdate}" Click="Update_Click" />
                         <MenuItem Header="{x:Static frame:Resources.ButtonClose}" Click="Close_Click" />

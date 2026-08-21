@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Support the Project — Sidebar Pc Monitor</title>
+<meta name="description" content="Support continued development of Sidebar Pc Monitor. Local Iraqi payment options and cryptocurrency addresses." />
+<meta name="color-scheme" content="dark" />
+<meta name="referrer" content="no-referrer" />
+<link rel="icon" href="logo.png" />
+<link rel="stylesheet" href="assets/css/donate.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="glow" aria-hidden="true"></div>
+
+<header class="site-head">
+  <a class="brand" href="https://github.com/oubahell/Sidebar-Pc-Monitor">
+    <img src="logo.png" width="34" height="34" alt="" />
+    <span>Sidebar Pc Monitor</span>
+  </a>
+  <a class="ghost-link" href="https://github.com/oubahell/Sidebar-Pc-Monitor">Back to project</a>
+</header>
+
+<main id="main">
+
+  <section class="hero">
+    <h1>Support the Project</h1>
+    <p class="lede">
+      If you enjoy this project and want to support its development, you can donate
+      using one of the options below.
+    </p>
+    <p class="hero-note">
+      Sidebar Pc Monitor is free and open source, and always will be. Donations are a
+      thank-you, never a requirement — nothing is locked behind them.
+    </p>
+  </section>
+
+  <div class="tabs" role="tablist" id="tablist" aria-label="Donation methods">
+    <button class="tab" role="tab" id="tab-iraq" aria-controls="panel-iraq" aria-selected="true" type="button">
+      <span class="tab__flag" aria-hidden="true">🇮🇶</span> From Iraq
+    </button>
+    <button class="tab" role="tab" id="tab-intl" aria-controls="panel-intl" aria-selected="false" type="button" tabindex="-1">
+      <span class="tab__flag" aria-hidden="true">🌍</span> International
+    </button>
+  </div>
+
+  <!-- ------------------------------------------------------------ Iraq -->
+  <section class="panel" id="panel-iraq" role="tabpanel" aria-labelledby="tab-iraq">
+    <div class="grid" id="local-grid">
+      <!-- cards built from DONATION_CONFIG in assets/js/donate.js -->
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------- International -->
+  <section class="panel" id="panel-intl" role="tabpanel" aria-labelledby="tab-intl" hidden>
+
+    <div class="chips" id="crypto-chips" role="tablist" aria-label="Choose a cryptocurrency and network">
+      <!-- chips built from DONATION_CONFIG -->
+    </div>
+
+    <article class="card card--crypto">
+      <div class="card__head">
+        <div>
+          <h3 class="card__title">
+            <span id="crypto-name">Bitcoin</span>
+            <span class="ticker" id="crypto-ticker">BTC</span>
+          </h3>
+          <p class="card__sub">Send only on the network shown below.</p>
+        </div>
+        <span class="badge badge--network" id="crypto-network">Bitcoin</span>
+      </div>
+
+      <div class="network-callout" role="note">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+          <path d="M12 2 3 6v6c0 5 3.8 9.3 9 10 5.2-.7 9-5 9-10V6l-9-4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M12 8v5M12 16h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <p id="crypto-warning">Send BTC using the Bitcoin network only.</p>
+      </div>
+
+      <div class="crypto-body">
+        <div class="qr-plate" id="crypto-qr"></div>
+
+        <div class="crypto-detail">
+          <p class="field-label" id="address-label">Address</p>
+          <code class="value__text value__text--block" id="crypto-address" aria-labelledby="address-label"></code>
+
+          <button class="btn btn--primary" id="crypto-copy" type="button">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+              <rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M5 15V6a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+            <span class="copy-label">Copy</span> Address
+          </button>
+
+          <p class="card__hint">
+            Scan the code with your wallet, or copy the address. Always check the first
+            and last few characters after pasting.
+          </p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ---------------------------------------------------------- safety -->
+  <section class="notice" aria-labelledby="safety-heading">
+    <h2 id="safety-heading">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+        <path d="M12 2 3 6v6c0 5 3.8 9.3 9 10 5.2-.7 9-5 9-10V6l-9-4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      </svg>
+      Before you send anything
+    </h2>
+    <ul>
+      <li><strong>Check the address character by character</strong> after pasting — at minimum the first four and last four.</li>
+      <li><strong>Check the network matches.</strong> USDT on Tron and USDT on BNB Smart Chain are different addresses. Sending on the wrong one loses the funds permanently, and nobody can reverse it.</li>
+      <li><strong>Send a small test amount first</strong> if you are sending anything significant.</li>
+      <li>This page will never ask for a password, a seed phrase, a private key or an exchange login. If anything ever does, it is not us.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <p>
+    Donations are voluntary and help support continued development of this project.
+    Cryptocurrency transactions are irreversible. Always verify the address and
+    selected network before sending funds.
+  </p>
+  <p class="foot-meta">
+    <a href="https://github.com/oubahell/Sidebar-Pc-Monitor">Sidebar Pc Monitor</a> ·
+    <a href="https://github.com/oubahell/Sidebar-Pc-Monitor/blob/main/PRIVACY.md">Privacy</a> ·
+    <a href="https://github.com/oubahell/Sidebar-Pc-Monitor/blob/main/LICENSE.md">GPL-3.0</a>
+    · © <span id="year">2026</span> ObaiDa.A
+  </p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/js/vendor/qrcode.js"></script>
+<script src="assets/js/donate.js"></script>
+</body>
+</html>

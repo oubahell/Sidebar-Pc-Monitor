@@ -29,3 +29,24 @@ LibreHardwareMonitor communicates with PawnIO solely through that device IO cont
 **Written offer of source code:** the complete corresponding source for the redistributed PawnIO binary is available from https://github.com/namazso/PawnIO. The bundled installer is the unmodified official release, downloaded from https://github.com/namazso/PawnIO.Setup/releases.
 
 The installer is only run after the user explicitly agrees to the prompt shown on first launch; declining is remembered and the application continues without it.
+
+## qrcode-generator (donation page)
+
+The donation page at [`docs/donate.html`](docs/donate.html) draws its QR codes with
+**qrcode-generator** by **Kazuhiko Arase**, vendored at
+`docs/assets/js/vendor/qrcode.js`.
+
+* Version: 1.4.4, unmodified
+* Source: https://github.com/kazuhikoarase/qrcode-generator
+* Obtained from: https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js
+* SHA-256: `18ae399f81182bc9de916e9c77b195df20cc58d6f2d55a62b085a299f1bf1780`
+* Licence: **MIT**
+
+It is vendored rather than loaded from a CDN on purpose. The page shows
+cryptocurrency addresses, and a script fetched at run time from a third party
+could be swapped for one that redraws the QR code with somebody else's address.
+A copy in this repository can be checked against the hash above, is reviewable in
+the same pull request as everything else, and means the page makes no external
+requests at all.
+
+> "QR Code" is a registered trademark of DENSO WAVE INCORPORATED.
