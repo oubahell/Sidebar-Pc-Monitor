@@ -17,9 +17,20 @@ CPU, GPU, RAM, drives, network, and how much power the whole machine is pulling,
 
 <br />
 
-<img src="docs/sidebar.png" width="260" alt="Sidebar Pc Monitor showing CPU, RAM, GPU, power and network readings" />
+<table>
+<tr>
+<td align="center" valign="top"><img src="docs/gamer.png" width="150" alt="Gamer preset" /></td>
+<td align="center" valign="top"><img src="docs/advanced.png" width="150" alt="Advanced preset" /></td>
+<td align="center" valign="top"><img src="docs/custom.png" width="150" alt="Custom preset" /></td>
+</tr>
+<tr>
+<td align="center"><b>Gamer</b><br /><sub>thermals, power, headroom</sub></td>
+<td align="center"><b>Advanced</b><br /><sub>everything, drives off</sub></td>
+<td align="center"><b>Custom</b><br /><sub>just what you pick</sub></td>
+</tr>
+</table>
 
-<sub>The Gamer preset in the Bars layout, High-Contrast Dark theme.</sub>
+<sub>Same PC, three presets. Bars layout, High-Contrast Dark theme.</sub>
 
 </div>
 
