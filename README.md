@@ -181,6 +181,12 @@ msbuild "SidebarDiagnostics\SidebarPcMonitor.csproj" /p:Configuration=Release
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for architecture notes and the traps worth knowing.
 
+Every release is built by [GitHub Actions](.github/workflows/release.yml) from a
+tagged commit, not from anyone's machine — see the
+[code signing policy](docs/CODE_SIGNING.md) for how that works and what it means.
+
+Bug reports, layout packs and translations are welcome: [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Credits
 
 Built on [**Sidebar Diagnostics**](https://github.com/ArcadeRenegade/SidebarDiagnostics) by
