@@ -482,7 +482,7 @@
     <comment>Title of the graph window</comment>
   </data>
   <data name="LanguageChangedText" xml:space="preserve">
-    <value>من فضلك أعد تشغيل الأداة.</value>
+    <value>سيتم إعادة تشغيل التطبيق الآن لإكمال تغيير اللغة.</value>
     <comment>Text of the language changed popup</comment>
   </data>
   <data name="LanguageChangedTitle" xml:space="preserve">
@@ -806,7 +806,7 @@
     <comment>Settings theme tooltip</comment>
   </data>
   <data name="SettingsResetAll" xml:space="preserve">
-    <value>استعادة الإعدادات الافتراضية</value>
+    <value>الإعدادات الافتراضية</value>
     <comment>Settings reset all button</comment>
   </data>
   <data name="SettingsResetAllTooltip" xml:space="preserve">
@@ -1128,6 +1128,18 @@
   <data name="SetupText" xml:space="preserve">
     <value>هل الشريط الجانبي ظاهر على يمين الشاشة ؟</value>
     <comment>Text of the initial setup page</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>متابعة</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>يمكنك تغيير هذا لاحقًا من الإعدادات.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>اختر لغتك</value>
+    <comment>Title of the first run language picker</comment>
   </data>
   <data name="SetupTitle" xml:space="preserve">
     <value>الإعدادات الأولية</value>

@@ -482,7 +482,7 @@
     <comment>Title of the graph window</comment>
   </data>
   <data name="LanguageChangedText" xml:space="preserve">
-    <value>Por favor reinicia la aplicación.</value>
+    <value>La aplicación se reiniciará para aplicar el nuevo idioma.</value>
     <comment>Text of the language changed popup</comment>
   </data>
   <data name="LanguageChangedTitle" xml:space="preserve">
@@ -1040,5 +1040,17 @@
   <data name="SettingsShowMachineNameTooltip" xml:space="preserve">
     <value>Muestra el nombre de la computadora.</value>
     <comment>Settings show machine name tooltip</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Continuar</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Puedes cambiarlo más adelante en Configuración.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Elige tu idioma</value>
+    <comment>Title of the first run language picker</comment>
   </data>
 </root>

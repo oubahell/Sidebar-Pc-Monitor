@@ -405,4 +405,16 @@
     <value>Synlighed</value>
     <comment>Visibility taskbar menu item</comment>
   </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Fortsæt</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Du kan ændre dette senere under Indstillinger.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Vælg dit sprog</value>
+    <comment>Title of the first run language picker</comment>
+  </data>
 </root>

@@ -482,7 +482,7 @@
     <comment>Title of the graph window</comment>
   </data>
   <data name="LanguageChangedText" xml:space="preserve">
-    <value>Пожалуйста, перезапустите приложение.</value>
+    <value>Приложение перезапустится, чтобы применить новый язык.</value>
     <comment>Text of the language changed popup</comment>
   </data>
   <data name="LanguageChangedTitle" xml:space="preserve">
@@ -1040,5 +1040,17 @@
   <data name="SettingsShowMachineNameTooltip" xml:space="preserve">
     <value>Показывает имя компьютера.</value>
     <comment>Settings show machine name tooltip</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Продолжить</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Это можно изменить позже в настройках.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Выберите язык</value>
+    <comment>Title of the first run language picker</comment>
   </data>
 </root>

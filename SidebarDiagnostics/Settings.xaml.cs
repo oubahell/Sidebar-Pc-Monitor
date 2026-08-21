@@ -32,6 +32,21 @@ namespace SidebarDiagnostics
         {
             Model.Save();
 
+            // A language change cannot be applied to windows that already exist, so the app
+            // relaunches itself. Everything is on disk by now, so nothing is lost.
+            if (Model.CultureChanged)
+            {
+                MessageBox.Show(
+                    Framework.Resources.LanguageChangedText,
+                    Framework.Resources.LanguageChangedTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information,
+                    MessageBoxResult.OK);
+
+                App.Restart();
+                return;
+            }
+
             App.ApplyTheme(Model.Theme);
             Framework.LayoutManager.Apply(Model.Layout);
 

@@ -481,7 +481,7 @@
     <comment>Title of the graph window</comment>
   </data>
 	<data name="LanguageChangedText" xml:space="preserve">
-    <value>请重新启动应用程序。</value>
+    <value>应用将重新启动以完成语言切换。</value>
     <comment>Text of the language changed popup</comment>
   </data>
 	<data name="LanguageChangedTitle" xml:space="preserve">
@@ -1039,5 +1039,17 @@
 	<data name="SettingsShowMachineNameTooltip" xml:space="preserve">
     <value>显示计算机的名称。</value>
     <comment>Settings show machine name tooltip</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>继续</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>稍后可在设置中更改。</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>选择您的语言</value>
+    <comment>Title of the first run language picker</comment>
   </data>
 </root>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -25,15 +25,23 @@ namespace SidebarDiagnostics
     /// </summary>
     public partial class App : Application
     {
-        protected async override void OnStartup(StartupEventArgs e)
+        public App()
         {
             // UPDATER HOOKS
-            // Must run before anything else. The installer relaunches the app with private
-            // arguments to register shortcuts, migrate an update or clean up an uninstall; this
-            // handles those and exits the process. Skipping it, or running it late, leaves an
-            // install half-finished.
+            //
+            // These must run before any UI exists. An install, update or uninstall relaunches
+            // this exe with private arguments; Run() handles those and exits the process.
+            //
+            // The constructor is the earliest point we can reach. WPF generates our Main, and it
+            // reads "new App(); app.InitializeComponent(); app.Run();" - InitializeComponent is
+            // what builds App.xaml's resources, which include the whole theme and a live tray
+            // icon. Doing that during an install hook is wasted work at best, and a throwing
+            // resource would leave the install half-finished. OnStartup is later still.
             VelopackApp.Build().Run();
+        }
 
+        protected async override void OnStartup(StartupEventArgs e)
+        {
             base.OnStartup(e);
 
             // ERROR HANDLING
@@ -43,6 +51,21 @@ namespace SidebarDiagnostics
 
             // LANGUAGE
             Culture.SetDefault();
+
+            // THEME
+            // Applied up here, ahead of the first-run language picker, so that window is dressed
+            // like the rest of the app rather than in bare WPF grey.
+            ApplyTheme(Framework.Settings.Instance.Theme);
+
+            // FIRST RUN LANGUAGE
+            // Asked before SetCurrent for two reasons: SetCurrent's OverrideMetadata call can only
+            // happen once per run, and everything after this point - the setup wizard, the tray
+            // tooltip, the sidebar - should already be in the language just chosen.
+            if (Framework.Settings.Instance.InitialSetup)
+            {
+                new LanguageSetup().ShowDialog();
+            }
+
             Culture.SetCurrent(true);
 
             // UPDATE
@@ -55,9 +78,6 @@ namespace SidebarDiagnostics
 
             // SETTINGS
             CheckSettings();
-
-            // THEME
-            ApplyTheme(Framework.Settings.Instance.Theme);
 
             // LAYOUT
             // Applied before the sidebar is built so the metric rows render in the chosen layout
@@ -118,6 +138,31 @@ namespace SidebarDiagnostics
         public static void RefreshIcon()
         {
             TrayIcon.Visibility = Framework.Settings.Instance.ShowTrayIcon ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        /// <summary>
+        /// Relaunches the app in place.
+        /// </summary>
+        /// <remarks>
+        /// This is what a language change needs. Every visible string is bound with x:Static, which
+        /// XAML resolves once when the window is loaded, so pointing Resources.Culture somewhere new
+        /// underneath a running window changes nothing on screen. Reloading only the sidebar - which
+        /// is what Apply used to do - is why the app appeared to restart and come back in the old
+        /// language: the sidebar was rebuilt from the same already-resolved strings, and the settings
+        /// window, tray menu and tooltips were never rebuilt at all.
+        ///
+        /// Settings are written to disk before we get here, so the new process reads the new value.
+        /// The relaunched process inherits this one's elevation, so there is no second UAC prompt.
+        /// </remarks>
+        public static void Restart()
+        {
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = Process.GetCurrentProcess().MainModule.FileName,
+                UseShellExecute = true
+            });
+
+            Current.Shutdown();
         }
 
         /// <summary>

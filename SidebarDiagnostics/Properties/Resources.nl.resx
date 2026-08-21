@@ -405,4 +405,16 @@
     <value>Zichtbaarheid</value>
     <comment>Visibility taskbar menu item</comment>
   </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Doorgaan</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Je kunt dit later wijzigen bij Instellingen.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Kies je taal</value>
+    <comment>Title of the first run language picker</comment>
+  </data>
 </root>

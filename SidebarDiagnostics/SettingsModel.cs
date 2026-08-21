@@ -171,10 +171,9 @@ namespace SidebarDiagnostics.Models
 
         public void Save()
         {
-            if (!string.Equals(Culture, Framework.Settings.Instance.Culture, StringComparison.Ordinal))
-            {
-                MessageBox.Show(Resources.LanguageChangedText, Resources.LanguageChangedTitle, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-            }
+            // Recorded rather than acted on here, because the caller has to finish persisting
+            // everything before the app can be relaunched. See Settings.xaml.cs.
+            CultureChanged = !string.Equals(Culture, Framework.Settings.Instance.Culture, StringComparison.Ordinal);
 
             Framework.Settings.Instance.DockEdge = DockEdge;
             Framework.Settings.Instance.Theme = Theme;
@@ -504,6 +503,12 @@ namespace SidebarDiagnostics.Models
                 NotifyPropertyChanged("Culture");
             }
         }
+
+        /// <summary>
+        /// Set by Save() when the chosen language differs from the one in force. The app has to be
+        /// relaunched to pick it up; nothing about it is persisted.
+        /// </summary>
+        public bool CultureChanged { get; private set; }
 
         private CultureItem[] _cultureItems { get; set; }
 

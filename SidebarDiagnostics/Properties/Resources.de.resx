@@ -405,4 +405,16 @@
     <value>Sichtbarkeit</value>
     <comment>Visibility taskbar menu item</comment>
   </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Weiter</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Sie können dies später in den Einstellungen ändern.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Sprache auswählen</value>
+    <comment>Title of the first run language picker</comment>
+  </data>
 </root>

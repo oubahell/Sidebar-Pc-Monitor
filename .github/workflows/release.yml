@@ -1,0 +1,121 @@
+# Builds and publishes a release when a version tag is pushed.
+#
+#   git tag v4.0.3 && git push origin v4.0.3
+#
+# Produces three things, because they suit different people:
+#   Setup.exe   per-user install, no admin prompt, receives automatic updates
+#   .msi        machine-wide install, for deploying across an organisation
+#   Portable    a zip, for running off a stick or trying it without installing
+#
+# The version comes from the tag, so the tag is the single source of truth. Keep it in step with
+# AssemblyInfo.cs - the job checks and fails loudly if they disagree.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build, without the leading v (e.g. 4.0.3)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Work out the version
+        id: version
+        shell: pwsh
+        run: |
+          $v = if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            '${{ github.event.inputs.version }}'
+          } else {
+            '${{ github.ref_name }}' -replace '^v', ''
+          }
+
+          # The tag and the assembly must agree, or the installed app reports a version that does
+          # not match the release people downloaded, and the updater's comparison goes wrong.
+          $info = Get-Content 'SidebarDiagnostics\Properties\AssemblyInfo.cs' -Raw
+          if ($info -notmatch 'AssemblyVersion\("([0-9]+\.[0-9]+\.[0-9]+)') {
+            throw "Could not read AssemblyVersion from AssemblyInfo.cs"
+          }
+          $assembly = $Matches[1]
+          if ($assembly -ne $v) {
+            throw "Tag says $v but AssemblyInfo.cs says $assembly - bump one of them."
+          }
+
+          "version=$v" >> $env:GITHUB_OUTPUT
+          Write-Host "Building $v"
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - uses: microsoft/setup-msbuild@v2
+
+      - uses: NuGet/setup-nuget@v2
+
+      # LibreHardwareMonitorLib is an SDK-style, multi-targeted project; the app is a legacy
+      # .csproj that references its build output as a plain DLL path. It has to be built first,
+      # and only for net472 - the other target frameworks are not used here and only cost time.
+      - name: Build LibreHardwareMonitorLib
+        run: dotnet build "LibreHardwareMonitor\LibreHardwareMonitorLib\LibreHardwareMonitorLib.csproj" -c Release -f net472
+
+      - name: Restore NuGet packages
+        run: nuget restore SidebarPcMonitor.sln
+
+      - name: Build the app
+        run: msbuild "SidebarDiagnostics\SidebarPcMonitor.csproj" /p:Configuration=Release /p:Platform=AnyCPU /v:minimal
+
+      - name: Install the Velopack CLI
+        run: dotnet tool install -g vpk --version 1.2.0
+
+      # vpk packages a directory as-is, so debug symbols and XML doc files would otherwise ship to
+      # users inside every download and every delta.
+      - name: Stage the build
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path stage | Out-Null
+          Copy-Item "SidebarDiagnostics\bin\Release\*" stage -Recurse -Force
+          Get-ChildItem stage -Include *.pdb, *.xml -Recurse | Remove-Item -Force
+          if (-not (Test-Path "stage\SidebarPcMonitor.exe")) { throw "SidebarPcMonitor.exe missing from the staged build" }
+
+      - name: Package
+        shell: pwsh
+        run: |
+          vpk pack `
+            --packId SidebarPcMonitor `
+            --packVersion ${{ steps.version.outputs.version }} `
+            --packDir stage `
+            --mainExe SidebarPcMonitor.exe `
+            --packTitle "Sidebar Pc Monitor" `
+            --packAuthors "ObaiDa.A" `
+            --icon "SidebarDiagnostics\Sidebar.ico" `
+            --msi `
+            --outputDir Releases
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: v${{ steps.version.outputs.version }}
+          draft: true
+          generate_release_notes: true
+          # The .nupkg and the RELEASES/*.json files are not for people to click - the in-app
+          # updater reads them from the release assets, so they have to be attached too.
+          files: |
+            Releases/*.exe
+            Releases/*.msi
+            Releases/*.zip
+            Releases/*.nupkg
+            Releases/RELEASES
+            Releases/*.json

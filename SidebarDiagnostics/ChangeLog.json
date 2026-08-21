@@ -1,5 +1,14 @@
 ﻿[
 	{
+		"Version": "4.0.3",
+		"Changes": [
+			"You now pick your language the first time the app runs, instead of hunting for it in Settings.",
+			"Fixed the setup wizard's headings being near-invisible dark grey on the dark themes.",
+			"Installs and updates no longer build the whole interface before finishing, so they complete cleanly.",
+			"Releases now ship as a Setup.exe, a machine-wide MSI and a portable zip."
+		]
+	},
+	{
 		"Version": "4.0.2",
 		"Changes": [
 			"Updates now work again, installed straight from GitHub releases.",

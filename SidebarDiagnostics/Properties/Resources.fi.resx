@@ -482,7 +482,7 @@
     <comment>Title of the graph window</comment>
   </data>
   <data name="LanguageChangedText" xml:space="preserve">
-    <value>Käynnistä ohjelma uudelleen.</value>
+    <value>Sovellus käynnistyy uudelleen kielen vaihtamiseksi.</value>
     <comment>Text of the language changed popup</comment>
   </data>
   <data name="LanguageChangedTitle" xml:space="preserve">
@@ -1040,5 +1040,17 @@
   <data name="SettingsShowMachineNameTooltip" xml:space="preserve">
     <value>Näyttää tietokoneen nimen.</value>
     <comment>Settings show machine name tooltip</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Jatka</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Voit vaihtaa tämän myöhemmin asetuksista.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Valitse kielesi</value>
+    <comment>Title of the first run language picker</comment>
   </data>
 </root>

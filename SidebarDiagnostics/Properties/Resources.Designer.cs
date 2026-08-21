@@ -2455,6 +2455,33 @@ namespace SidebarDiagnostics.Framework {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Continue.
+        /// </summary>
+        public static string ButtonContinue {
+            get {
+                return ResourceManager.GetString("ButtonContinue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can change this later in Settings..
+        /// </summary>
+        public static string SetupLanguageSubtitle {
+            get {
+                return ResourceManager.GetString("SetupLanguageSubtitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose your language.
+        /// </summary>
+        public static string SetupLanguageTitle {
+            get {
+                return ResourceManager.GetString("SetupLanguageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Initial Setup.
         /// </summary>
         public static string SetupTitle {

@@ -34,6 +34,17 @@ dotnet build "LibreHardwareMonitor\LibreHardwareMonitorLib\LibreHardwareMonitorL
 The app references `LibreHardwareMonitor\bin\Release\AnyCPU\net472\LibreHardwareMonitorLib.dll`
 plus its transitive dependencies, all listed explicitly in the `.csproj`.
 
+**Use that MSBuild, not `dotnet msbuild`.** `dotnet msbuild` picks up whatever SDK is installed; on
+an SDK 11 preview it fails the temp-assembly pass WPF uses to resolve local types in XAML, and
+reports it as `'App' does not have a suitable static 'Main' method` followed by a wall of
+`InitializeComponent does not exist`. Both are lies - the markup compiler simply produced no `.g.cs`.
+The Framework MSBuild under `C:\Windows\Microsoft.NET\Framework64` is no good either; it compiles as
+C# 5 and chokes on auto-property initialisers throughout the codebase.
+
+**When the errors say `InitializeComponent` is missing everywhere, delete `obj\`.** Markup compile
+caches aggressively, and a failed pass leaves stale `.g.cs` behind that the next build reuses - so a
+real fix keeps reporting the old failure.
+
 ### The running app locks the .exe and you usually cannot kill it
 
 `app.manifest` sets `requireAdministrator`, so the running app is elevated. A non-elevated agent

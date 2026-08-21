@@ -784,7 +784,7 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="Background" Value="Transparent" />
-                <Setter Property="Foreground" Value="#000000" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Setter Property="BorderBrush" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
             </Style>
@@ -869,10 +869,10 @@
                         <Setter Property="Width" Value="10" />
                         <Setter Property="Height" Value="10" />
                         <Setter Property="Margin" Value="2,0" />
-                        <Setter Property="Fill" Value="#9F9F9F" />
+                        <Setter Property="Fill" Value="{DynamicResource ChromeAccentBrush}" />
                         <Style.Triggers>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Fill" Value="#DDD" />
+                                <Setter Property="Fill" Value="{DynamicResource ChromeBorderBrush}" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -882,7 +882,7 @@
             <Style x:Key="SetupTitle" TargetType="{x:Type Label}">
                 <Setter Property="Margin" Value="0,10,0,0" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="Foreground" Value="#333" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Setter Property="FontSize" Value="18" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
@@ -890,8 +890,9 @@
             <Style x:Key="SetupSubtitle" TargetType="{x:Type TextBlock}">
                 <Setter Property="Margin" Value="0,10" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="MaxWidth" Value="220" />
-                <Setter Property="Foreground" Value="#111" />
+                <Setter Property="MaxWidth" Value="260" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
+                <Setter Property="Opacity" Value="0.85" />
                 <Setter Property="FontSize" Value="14" />
                 <Setter Property="TextAlignment" Value="Center" />
                 <Setter Property="TextWrapping" Value="Wrap" />
@@ -914,7 +915,7 @@
             <Style x:Key="UpdateTitle" TargetType="{x:Type Label}">
                 <Setter Property="Margin" Value="10" />
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="Foreground" Value="#333" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Setter Property="FontSize" Value="14" />
                 <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
@@ -933,7 +934,7 @@
                             <Border Name="PART_Track" CornerRadius="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding Foreground}" BorderThickness="1">
                                 <Grid>
                                     <Border Name="PART_Indicator" CornerRadius="2,0,0,2" Background="{TemplateBinding Foreground}" BorderBrush="{TemplateBinding Background}" BorderThickness="0" Panel.ZIndex="0" HorizontalAlignment="Left" />
-                                    <Label Content="{TemplateBinding Value, Converter={StaticResource PercentConverter}}" Margin="0" Padding="0,0,0,1" FontSize="12" Foreground="#333333" Panel.ZIndex="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <Label Content="{TemplateBinding Value, Converter={StaticResource PercentConverter}}" Margin="0" Padding="0,0,0,1" FontSize="12" Foreground="{DynamicResource ChromeForegroundBrush}" Panel.ZIndex="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Grid>
                             </Border>
                         </ControlTemplate>
@@ -952,7 +953,7 @@
 
             <Style x:Key="ChangeLogBullet" TargetType="{x:Type TextBlock}">
                 <Setter Property="Margin" Value="0,0,8,4" />
-                <Setter Property="Foreground" Value="#333" />
+                <Setter Property="Foreground" Value="{DynamicResource ChromeForegroundBrush}" />
                 <Setter Property="FontSize" Value="14" />
                 <Setter Property="Text" Value="•" />
             </Style>

@@ -410,7 +410,7 @@
     <comment>Title of the graph window</comment>
   </data>
   <data name="LanguageChangedText" xml:space="preserve">
-    <value>Bitte starten Sie die Anwendung neu!</value>
+    <value>Die App wird jetzt neu gestartet, um die Sprache zu ändern.</value>
     <comment>Text of the language changed popup</comment>
   </data>
   <data name="LanguageChangedTitle" xml:space="preserve">
@@ -988,5 +988,17 @@
   <data name="UpdateTitle" xml:space="preserve">
     <value>Aktualisierung</value>
     <comment>Title of the update window</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Weiter</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Sie können dies später in den Einstellungen ändern.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Sprache auswählen</value>
+    <comment>Title of the first run language picker</comment>
   </data>
 </root>

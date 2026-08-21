@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -410,7 +410,7 @@
     <comment>Title of the graph window</comment>
   </data>
   <data name="LanguageChangedText" xml:space="preserve">
-    <value>Riavvia l'app.</value>
+    <value>L'app verrà riavviata per applicare la nuova lingua.</value>
     <comment>Text of the language changed popup</comment>
   </data>
   <data name="LanguageChangedTitle" xml:space="preserve">
@@ -1040,5 +1040,17 @@
   <data name="UpdateTitle" xml:space="preserve">
     <value>Aggiornamento in corso</value>
     <comment>Title of the update window</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Continua</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>Potrai modificarla in seguito nelle impostazioni.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Scegli la tua lingua</value>
+    <comment>Title of the first run language picker</comment>
   </data>
 </root>

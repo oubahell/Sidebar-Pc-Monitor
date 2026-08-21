@@ -629,7 +629,7 @@ You can install it manually from https://pawnio.eu and restart the app.</value>
     <comment>Title of the graph window</comment>
   </data>
   <data name="LanguageChangedText" xml:space="preserve">
-    <value>Please restart the app.</value>
+    <value>The app will now restart to finish changing the language.</value>
     <comment>Text of the language changed popup</comment>
   </data>
   <data name="LanguageChangedTitle" xml:space="preserve">
@@ -1127,6 +1127,18 @@ You can install it manually from https://pawnio.eu and restart the app.</value>
   <data name="SetupText" xml:space="preserve">
     <value>Is the sidebar visible and docked to the right edge of your primary monitor?</value>
     <comment>Text of the initial setup page</comment>
+  </data>
+  <data name="ButtonContinue" xml:space="preserve">
+    <value>Continue</value>
+    <comment>Text of the continue button</comment>
+  </data>
+  <data name="SetupLanguageSubtitle" xml:space="preserve">
+    <value>You can change this later in Settings.</value>
+    <comment>Subtitle of the first run language picker</comment>
+  </data>
+  <data name="SetupLanguageTitle" xml:space="preserve">
+    <value>Choose your language</value>
+    <comment>Title of the first run language picker</comment>
   </data>
   <data name="SetupTitle" xml:space="preserve">
     <value>Initial Setup</value>

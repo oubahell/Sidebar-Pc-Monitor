@@ -265,6 +265,9 @@
     </Compile>
     <Compile Include="Monitoring.cs" />
     <Compile Include="SettingsModel.cs" />
+    <Compile Include="LanguageSetup.xaml.cs">
+      <DependentUpon>LanguageSetup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -311,6 +314,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LanguageSetup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

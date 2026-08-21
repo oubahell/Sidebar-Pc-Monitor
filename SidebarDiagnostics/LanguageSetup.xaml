@@ -1,0 +1,44 @@
+<sty:FlatWindow
+        x:Class="SidebarDiagnostics.LanguageSetup"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SidebarDiagnostics"
+        xmlns:frame="clr-namespace:SidebarDiagnostics.Framework"
+        xmlns:sty="clr-namespace:SidebarDiagnostics.Style"
+        mc:Ignorable="d"
+        Title="{x:Static frame:Resources.AppName}"
+        Icon="Sidebar.ico"
+        Width="400"
+        SizeToContent="Height"
+        ShowIcon="False"
+        ShowTitle="False"
+        ShowMinimize="False"
+        ShowMaximize="False"
+        ShowClose="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource FlatWindowStyle}">
+    <!-- A plain DockPanel, not the SetupPage style: that style is built for the wizard's
+         stacked pages and starts out IsEnabled="False", which collapses it. -->
+    <DockPanel LastChildFill="True" Margin="20,10,20,10">
+        <StackPanel DockPanel.Dock="Top" Style="{StaticResource VerticalPanel}">
+            <Label Content="{x:Static frame:Resources.SetupLanguageTitle}" Style="{StaticResource SetupTitle}" />
+            <TextBlock Text="{x:Static frame:Resources.SetupLanguageSubtitle}" Style="{StaticResource SetupSubtitle}" />
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Style="{StaticResource WindowButtons}">
+            <Button Content="{x:Static frame:Resources.ButtonContinue}" Click="Continue_Click" Style="{StaticResource SuccessButton}" IsDefault="True" />
+        </StackPanel>
+
+        <StackPanel Style="{StaticResource SetupContent}">
+            <!-- A ComboBox rather than a list: the app themes ComboBox everywhere else, so this
+                 matches the language selector the user will meet again in Settings. -->
+            <ComboBox x:Name="LanguageBox"
+                      DisplayMemberPath="Text"
+                      SelectedValuePath="Value" />
+        </StackPanel>
+    </DockPanel>
+</sty:FlatWindow>

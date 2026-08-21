@@ -19,7 +19,7 @@
         Closed="Window_Closed"
         Title="{x:Static frame:Resources.SettingsTitle}"
         Icon="Settings.ico"
-        Width="420"
+        Width="460"
         SizeToContent="Height"
         ShowMaximize="False"
         WindowStartupLocation="CenterScreen"
@@ -30,12 +30,14 @@
     </Window.Resources>
     <DockPanel LastChildFill="True">
         <!-- Reset is docked left, away from the confirm/dismiss group, so it can't be hit by
-             muscle memory aimed at Save. -->
+             muscle memory aimed at Save.
+
+             Save/Apply/Close come first in the markup even though they sit on the right, because a
+             DockPanel hands out space in child order and keeps nothing back. Reset was first, and
+             in languages where its label is long - Arabic's runs to five words - it ate the width
+             and pushed Close clean off the window. Ordering it last means the shortfall lands on
+             Reset, whose label ellipsises, instead of on the buttons that dismiss the dialog. -->
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="15">
-            <Button DockPanel.Dock="Left" VerticalAlignment="Bottom" Margin="0"
-                    Content="{x:Static frame:Resources.SettingsResetAll}"
-                    ToolTip="{x:Static frame:Resources.SettingsResetAllTooltip}"
-                    Click="ResetDefaultsButton_Click" Style="{StaticResource NeutralButton_SM}" />
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Bottom">
             <Button Content="{x:Static frame:Resources.ButtonSave}" Click="SaveButton_Click" Style="{StaticResource WindowButton_SM}" />
             <Button Content="{x:Static frame:Resources.ButtonApply}" IsEnabled="{Binding Path=IsChanged, Mode=OneWay}" Click="ApplyButton_Click" Style="{StaticResource SecondaryButton_SM}" />
@@ -52,6 +54,11 @@
                 </Button.Style>
             </Button>
             </StackPanel>
+            <Button DockPanel.Dock="Left" VerticalAlignment="Bottom" Margin="0,0,10,0"
+                    ToolTip="{x:Static frame:Resources.SettingsResetAllTooltip}"
+                    Click="ResetDefaultsButton_Click" Style="{StaticResource NeutralButton_SM}">
+                <TextBlock Text="{x:Static frame:Resources.SettingsResetAll}" TextTrimming="CharacterEllipsis" />
+            </Button>
         </DockPanel>
         <TabControl Style="{StaticResource SettingTab}">
             <TabItem Header="{x:Static frame:Resources.SettingsGeneralTab}">

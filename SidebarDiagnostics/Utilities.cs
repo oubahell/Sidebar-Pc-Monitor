@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.IO;
@@ -195,9 +196,76 @@ namespace SidebarDiagnostics.Utilities
             }
         }
 
+        /// <summary>
+        /// The language list for Settings: "Default", then one entry per supported language.
+        /// </summary>
+        /// <remarks>
+        /// One entry per language, not per region. This used to enumerate every specific culture
+        /// whose language we support, which meant scrolling past a dozen Englishes and a dozen
+        /// Arabics to find the only distinction that actually changes anything - the app has one
+        /// translation per language, so "English (Belize)" and "English (Jamaica)" were the same
+        /// choice listed twice.
+        ///
+        /// A culture already saved from the old list is added back in if it is not one of the
+        /// canonical entries, otherwise upgrading would leave the box blank with nothing selected.
+        /// </remarks>
         public static CultureItem[] GetAll()
         {
-            return new CultureItem[1] { new CultureItem() { Value = DEFAULT, Text = Resources.SettingsLanguageDefault } }.Concat(CultureInfo.GetCultures(CultureTypes.SpecificCultures).Where(c => Languages.Contains(c.TwoLetterISOLanguageName)).OrderBy(c => c.DisplayName).Select(c => new CultureItem() { Value = c.Name, Text = c.DisplayName })).ToArray();
+            List<CultureItem> _items = new List<CultureItem>();
+
+            _items.Add(new CultureItem() { Value = DEFAULT, Text = Resources.SettingsLanguageDefault });
+            _items.AddRange(GetNative());
+
+            string _saved = Framework.Settings.Instance.Culture;
+
+            if (!string.IsNullOrEmpty(_saved) && !_items.Any(i => string.Equals(i.Value, _saved, StringComparison.OrdinalIgnoreCase)))
+            {
+                try
+                {
+                    _items.Add(new CultureItem() { Value = _saved, Text = new CultureInfo(_saved).NativeName });
+                }
+                catch (CultureNotFoundException)
+                {
+                    // A settings file naming a culture Windows does not know. Leaving it out is
+                    // right - CultureInfo throws the same way when we try to apply it.
+                }
+            }
+
+            return _items.ToArray();
+        }
+
+        /// <summary>
+        /// The supported languages, each named in its own language, for the first-run picker.
+        /// </summary>
+        /// <remarks>
+        /// Autonyms rather than DisplayName: at first run nobody has told us which language the
+        /// user reads, so an entry reading "German" only helps someone who already reads English.
+        /// "Deutsch" is recognisable to the person hunting for it whatever the app is set to.
+        ///
+        /// The text comes from the neutral culture ("Deutsch") but the stored value is the
+        /// specific one ("de-DE"). Specific cultures carry the date and number formats the sidebar
+        /// renders with; a neutral one leaves those to chance.
+        /// </remarks>
+        public static CultureItem[] GetNative()
+        {
+            return Languages
+                .Select(l => new CultureItem()
+                {
+                    Value = CultureInfo.CreateSpecificCulture(l).Name,
+                    Text = CultureInfo.GetCultureInfo(l).NativeName
+                })
+                .OrderBy(c => c.Text, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// The supported language closest to the machine's own, for preselecting the picker.
+        /// </summary>
+        public static string GetNativeDefault()
+        {
+            string _language = Languages.Contains(Default.TwoLetterISOLanguageName) ? Default.TwoLetterISOLanguageName : "en";
+
+            return CultureInfo.CreateSpecificCulture(_language).Name;
         }
 
         public static string[] Languages
