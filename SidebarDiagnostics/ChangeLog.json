@@ -1,5 +1,13 @@
 ﻿[
 	{
+		"Version": "4.0.2",
+		"Changes": [
+			"Updates now work again, installed straight from GitHub releases.",
+			"The Gamer preset is now the default and matches a full, tuned set of readings.",
+			"Updated Newtonsoft.Json, which had a known security vulnerability."
+		]
+	},
+	{
 		"Version": "4.0.1",
 		"Changes": [
 			"CPU temperature, clocks and voltages now work: the PawnIO driver is bundled and installed on first run.",

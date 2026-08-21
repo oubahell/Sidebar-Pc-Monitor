@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using Squirrel;
+using Velopack;
+using Velopack.Sources;
 using Hardcodet.Wpf.TaskbarNotification;
 using SidebarDiagnostics.Monitoring;
 using SidebarDiagnostics.Utilities;
@@ -26,6 +27,13 @@ namespace SidebarDiagnostics
     {
         protected async override void OnStartup(StartupEventArgs e)
         {
+            // UPDATER HOOKS
+            // Must run before anything else. The installer relaunches the app with private
+            // arguments to register shortcuts, migrate an update or clean up an uninstall; this
+            // handles those and exits the process. Skipping it, or running it late, leaves an
+            // install half-finished.
+            VelopackApp.Build().Run();
+
             base.OnStartup(e);
 
             // ERROR HANDLING
@@ -217,60 +225,66 @@ namespace SidebarDiagnostics
             new Graph(_sidebar);
         }
 
+        /// <summary>
+        /// Checks GitHub Releases for a newer build and installs it.
+        ///
+        /// Replaces the original Squirrel.Windows implementation, which is unmaintained and whose
+        /// release feed pointed at the upstream project -- left as it was, it would have replaced
+        /// this fork with someone else's binary. Velopack is Squirrel's actively maintained
+        /// successor and reads releases straight from this repository.
+        ///
+        /// Updates only work for an installed build. Running loose from a build output folder there
+        /// is nothing for the updater to replace, so it reports "up to date" rather than failing.
+        /// </summary>
         private async Task AppUpdate(bool showInfo)
         {
-            string _exe = await SquirrelUpdate(showInfo);
+            string _feed = ConfigurationManager.AppSettings["CurrentReleaseURL"];
 
-            if (_exe != null && File.Exists(_exe))
+            if (string.IsNullOrWhiteSpace(_feed))
             {
-                try
-                {
-                    if (Framework.Settings.Instance.RunAtStartup)
-                    {
-                        Utilities.Startup.EnableStartupTask(_exe);
-                    }
-
-                    Process.Start(_exe);
-
-                    Shutdown();
-                }
-                catch (Win32Exception)
-                {
-                    // Relaunching the updated build failed (e.g. not running from a Squirrel-managed
-                    // install location). Keep running the current instance instead of crashing.
-                }
+                return;
             }
-        }
 
-        private async Task<string> SquirrelUpdate(bool showInfo)
-        {
             try
             {
-                using (UpdateManager _manager = new UpdateManager(ConfigurationManager.AppSettings["CurrentReleaseURL"]))
+                UpdateManager _manager = new UpdateManager(new GithubSource(_feed, null, false));
+
+                if (!_manager.IsInstalled)
                 {
-                    UpdateInfo _update = await _manager.CheckForUpdate();
-
-                    if (_update.ReleasesToApply.Any())
-                    {
-                        Version _newVersion = _update.ReleasesToApply.OrderByDescending(r => r.Version).First().Version.Version;
-
-                        Update _updateWindow = new Update();
-                        _updateWindow.Show();
-
-                        await _manager.UpdateApp((p) => _updateWindow.SetProgress(p));
-
-                        _updateWindow.Close();
-
-                        return Utilities.Paths.Exe(_newVersion);
-                    }
-                    else if (showInfo)
+                    if (showInfo)
                     {
                         MessageBox.Show(Framework.Resources.UpdateSuccessText, Framework.Resources.AppName, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                     }
+
+                    return;
                 }
+
+                UpdateInfo _update = await _manager.CheckForUpdatesAsync();
+
+                if (_update == null)
+                {
+                    if (showInfo)
+                    {
+                        MessageBox.Show(Framework.Resources.UpdateSuccessText, Framework.Resources.AppName, MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                    }
+
+                    return;
+                }
+
+                Update _updateWindow = new Update();
+                _updateWindow.Show();
+
+                await _manager.DownloadUpdatesAsync(_update, p => _updateWindow.SetProgress(p));
+
+                _updateWindow.Close();
+
+                // Hands over to the updater, which swaps the files and relaunches. Nothing after
+                // this runs, so the settings write above must already have happened.
+                _manager.ApplyUpdatesAndRestart(_update);
             }
             catch (WebException)
             {
+                // No connectivity, or the feed is unreachable. Silent unless the user asked.
                 if (showInfo)
                 {
                     MessageBox.Show(Framework.Resources.UpdateErrorText, Framework.Resources.UpdateErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
@@ -278,19 +292,28 @@ namespace SidebarDiagnostics
             }
             catch (Exception e)
             {
+                // Something structural is wrong with updating on this machine. Switch auto-update
+                // off so it cannot fail on every launch, and leave a trace in the event log.
                 Framework.Settings.Instance.AutoUpdate = false;
                 Framework.Settings.Instance.Save();
 
-                using (EventLog _log = new EventLog("Application"))
+                try
                 {
-                    _log.Source = Framework.Resources.AppName;
-                    _log.WriteEntry(e.ToString(), EventLogEntryType.Error, 100, 1);
+                    using (EventLog _log = new EventLog("Application"))
+                    {
+                        _log.Source = Framework.Resources.AppName;
+                        _log.WriteEntry(e.ToString(), EventLogEntryType.Error, 100, 1);
+                    }
+                }
+                catch (Exception)
+                {
                 }
 
-                MessageBox.Show(Framework.Resources.UpdateErrorFatalText, Framework.Resources.UpdateErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                if (showInfo)
+                {
+                    MessageBox.Show(Framework.Resources.UpdateErrorFatalText, Framework.Resources.UpdateErrorTitle, MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                }
             }
-
-            return null;
         }
 
         private void CheckSettings()

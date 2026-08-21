@@ -32,9 +32,10 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <TextBlock Margin="0,1,0,0" TextTrimming="CharacterEllipsis"
+                <!-- The user's own font colour at reduced opacity, not a fixed grey. -->
+                <TextBlock Margin="0,1,0,0" TextTrimming="CharacterEllipsis" Opacity="0.75"
                            Text="{Binding Path=FullName, Mode=OneWay}"
-                           Foreground="{DynamicResource ChromeMutedBrush}"
+                           Foreground="{Binding Source={x:Static frame:Settings.Instance}, Path=FontColor, Mode=OneWay}"
                            FontSize="{Binding Source={x:Static frame:Settings.Instance}, Path=FontSetting.SmallFontSize, Mode=OneWay}" />
 
                 <!-- A thin fill under the card, for readings where a proportion is meaningful. -->

@@ -13,9 +13,11 @@
     -->
     <DataTemplate x:Key="MetricTemplate" DataType="{x:Type monitor:iMetric}">
         <DockPanel Margin="0,0,0,1">
-            <TextBlock DockPanel.Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center"
+            <!-- The user's own font colour at reduced opacity, not a fixed grey, so the label stays
+                 legible against whatever background and colour they have chosen. -->
+            <TextBlock DockPanel.Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center" Opacity="0.75"
                        Text="{Binding Path=Label, Mode=OneWay}"
-                       Foreground="{DynamicResource ChromeMutedBrush}"
+                       Foreground="{Binding Source={x:Static frame:Settings.Instance}, Path=FontColor, Mode=OneWay}"
                        FontSize="{Binding Source={x:Static frame:Settings.Instance}, Path=FontSetting.SmallFontSize, Mode=OneWay}" />
 
             <TextBlock HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Center"

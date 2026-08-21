@@ -1,15 +1,16 @@
 # Sidebar Pc Monitor
 
 A Windows desktop sidebar (C# / WPF, .NET Framework 4.8.1) that displays live hardware sensor
-readings. Private repo: `oubahell/Sidebar-Pc-Monitor`.
+readings. Public repo: `oubahell/Sidebar-Pc-Monitor`.
 
 This is a **fork of [ArcadeRenegade/SidebarDiagnostics](https://github.com/ArcadeRenegade/SidebarDiagnostics)**
 (GPL-3.0), rebranded and modernised. Attribution to the original author is deliberate and required
 by the licence — keep it in `README.md` and `NOTICE.md`.
 
-The maintainer is **ObaiDa.A**. He is not a native English speaker and writes terse, sometimes
-all-caps requests; that is not annoyance, just brevity. He tests changes himself on real hardware and
-will tell you plainly when something looks wrong.
+Maintained by **ObaiDa.A**.
+
+These are working notes: how to build, and the traps that have already cost time. Read the build
+section before changing anything — this project does not build the way it looks like it should.
 
 ---
 
@@ -204,6 +205,9 @@ Each release:
 3. **Branch** — `git checkout -b v4.0.1`. One branch per version.
 4. **Commit** — explain *why* and name the root cause (see history for tone).
 5. **Push** — `git push -u origin v4.0.1`. Leave merging to `main` to the maintainer.
+
+Commit messages carry no co-author or tooling trailers — the maintainer is the sole author of this
+repository and wants it to read that way.
 
 Verify it compiles before committing. If the app is running and holding the `.exe`, a scratch-folder
 build type-checks — but **never** report a fix as done off a scratch build (see the warning above).

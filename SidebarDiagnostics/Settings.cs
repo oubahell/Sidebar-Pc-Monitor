@@ -89,7 +89,7 @@ namespace SidebarDiagnostics.Framework
             // layout, but only when CheckConfig runs at startup -- and the Settings dialog rebuilds
             // its view model immediately after a reset, which would read the null and throw.
             MonitorConfig = SidebarDiagnostics.Monitoring.MonitorConfig.CheckConfig(null);
-            MetricPreset = MetricPreset.Simple;
+            MetricPreset = MetricPreset.Gamer;
             Layout = LayoutManager.DEFAULT;
             Hotkeys = new Hotkey[0];
         }
@@ -277,7 +277,7 @@ namespace SidebarDiagnostics.Framework
             }
         }
 
-        private MetricPreset _metricPreset { get; set; } = MetricPreset.Simple;
+        private MetricPreset _metricPreset { get; set; } = MetricPreset.Gamer;
 
         /// <summary>
         /// Which curated metric set is active. Persisted only so the Settings dropdown opens on the
@@ -435,7 +435,9 @@ namespace SidebarDiagnostics.Framework
             }
         }
 
-        private bool _clickThrough { get; set; } = false;
+        // On by default: the sidebar is something you read, not something you interact with, so
+        // clicks belong to whatever window is underneath it. Settings stay reachable from the tray.
+        private bool _clickThrough { get; set; } = true;
 
         [JsonProperty]
         public bool ClickThrough
@@ -469,7 +471,9 @@ namespace SidebarDiagnostics.Framework
             }
         }
 
-        private bool _collapseMenuBar { get; set; } = false;
+        // Collapsed by default so the readings get the space rather than a row of buttons that are
+        // duplicated in the tray menu anyway.
+        private bool _collapseMenuBar { get; set; } = true;
 
         [JsonProperty]
         public bool CollapseMenuBar
@@ -554,7 +558,8 @@ namespace SidebarDiagnostics.Framework
             }
         }
 
-        private double _bgOpacity { get; set; } = 0.85d;
+        // Matches the default theme's preset, so a fresh install and a theme reset agree.
+        private double _bgOpacity { get; set; } = 0.9d;
 
         [JsonProperty]
         public double BGOpacity
@@ -707,7 +712,7 @@ namespace SidebarDiagnostics.Framework
             }
         }
 
-        private DateSetting _dateSetting { get; set; } = DateSetting.Short;
+        private DateSetting _dateSetting { get; set; } = DateSetting.Long;
 
         [JsonProperty]
         public DateSetting DateSetting

@@ -2193,17 +2193,25 @@ namespace SidebarDiagnostics.Monitoring
                         MetricKey.SystemPower
                     };
 
-                // Thermals, headroom and VRAM -- what actually explains a frame rate drop.
+                // Thermals, headroom, VRAM and power -- what actually explains a frame rate drop.
+                // This is the maintainer's own tuned configuration and doubles as the shipped
+                // default. Deliberately no drive metrics: disk space is something you check
+                // occasionally, not something worth standing watch over, and leaving them out
+                // switches the Drives panel off entirely.
                 case MetricPreset.Gamer:
                     return new MetricKey[]
                     {
-                        MetricKey.CPUTemp, MetricKey.CPULoad, MetricKey.CPUCoreMax, MetricKey.CPUClock,
-                        MetricKey.RAMLoad, MetricKey.RAMUsed,
-                        MetricKey.GPUTemp, MetricKey.GPUCoreLoad, MetricKey.GPUVRAMLoad,
-                        MetricKey.GPUCoreClock, MetricKey.GPUFanRPM, MetricKey.GPUPower,
-                        MetricKey.DriveLoadBar,
+                        MetricKey.CPUClock, MetricKey.CPUTemp, MetricKey.CPUVoltage, MetricKey.CPUPower,
+                        MetricKey.CPUCurrent, MetricKey.CPUFan, MetricKey.CPULoad, MetricKey.CPUCoreMax,
+                        MetricKey.RAMClock, MetricKey.RAMLoad, MetricKey.RAMUsed, MetricKey.RAMFree,
+                        MetricKey.GPUCoreClock, MetricKey.GPUVRAMClock, MetricKey.GPUCoreLoad,
+                        MetricKey.GPUVRAMLoad, MetricKey.GPUVoltage, MetricKey.GPUPower,
+                        MetricKey.GPUTemp, MetricKey.GPUFan,
+                        // Throughput only. The local IP is a fixed string rather than a live
+                        // reading, and putting someone's address on screen by default is not a
+                        // sensible thing to ship -- it stays one tick away for anyone who wants it.
                         MetricKey.NetworkIn, MetricKey.NetworkOut,
-                        MetricKey.SystemPower
+                        MetricKey.SystemPower, MetricKey.SystemCurrent
                     };
 
                 // Everything meaningful, including the electrical readings.
@@ -2524,8 +2532,10 @@ namespace SidebarDiagnostics.Monitoring
 
         /// <summary>
         /// The shipped configuration. The metric flags below describe everything this app can show;
-        /// <see cref="Default"/> then narrows them to the Simple preset, because enabling the lot
-        /// produces a wall of numbers on first run. Every metric stays one tick away in Settings.
+        /// <see cref="Default"/> then narrows them to the Gamer preset, which is the maintainer's
+        /// own tuned selection -- a useful spread without the readings that only matter when you go
+        /// looking for them. Every metric stays one tick away in Settings, and Simple is there for
+        /// anyone who wants less.
         /// </summary>
         public static MonitorConfig[] Default
         {
@@ -2533,7 +2543,7 @@ namespace SidebarDiagnostics.Monitoring
             {
                 MonitorConfig[] _config = DefaultAll;
 
-                MetricPresets.Apply(_config, MetricPreset.Simple);
+                MetricPresets.Apply(_config, MetricPreset.Gamer);
 
                 return _config;
             }

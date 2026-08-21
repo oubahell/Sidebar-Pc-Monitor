@@ -19,7 +19,18 @@ namespace SidebarDiagnostics.Framework
     /// </summary>
     public static class LayoutManager
     {
-        public const string DEFAULT = "Classic";
+        /// <summary>
+        /// Shipped default. Bars rather than Classic: the fill under a percentage reading conveys
+        /// "how loaded is this" faster than the number alone.
+        /// </summary>
+        public const string DEFAULT = "Bars";
+
+        /// <summary>
+        /// Fallback when a chosen layout cannot be loaded. Kept separate from
+        /// <see cref="DEFAULT"/> and deliberately the plainest layout, so recovery never depends on
+        /// whichever layout happens to be shipped as the default.
+        /// </summary>
+        public const string FALLBACK = "Classic";
 
         private static readonly string[] BUILTIN = new string[] { "Classic", "Compact", "Bars", "Tiles" };
 
@@ -74,11 +85,11 @@ namespace SidebarDiagnostics.Framework
 
             bool _loaded = _layout != null;
 
-            if (!_loaded && !string.Equals(name, DEFAULT, StringComparison.OrdinalIgnoreCase))
+            if (!_loaded && !string.Equals(name, FALLBACK, StringComparison.OrdinalIgnoreCase))
             {
                 // A layout that fails to parse must not leave the sidebar with no metric template
                 // at all, so fall back rather than propagating the failure.
-                _layout = Load(DEFAULT);
+                _layout = Load(FALLBACK);
             }
 
             if (_layout == null)

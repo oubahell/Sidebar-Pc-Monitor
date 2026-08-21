@@ -19,9 +19,12 @@
     <DataTemplate x:Key="MetricTemplate" DataType="{x:Type monitor:iMetric}">
         <StackPanel Margin="0,0,0,3">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center"
+                <!-- The label takes the user's own font colour at reduced opacity rather than a
+                     fixed grey: a hardcoded grey ignores their colour choice and reads as washed
+                     out against the sidebar's background. -->
+                <TextBlock DockPanel.Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center" Opacity="0.75"
                            Text="{Binding Path=Label, Mode=OneWay}"
-                           Foreground="{DynamicResource ChromeMutedBrush}"
+                           Foreground="{Binding Source={x:Static frame:Settings.Instance}, Path=FontColor, Mode=OneWay}"
                            FontSize="{Binding Source={x:Static frame:Settings.Instance}, Path=FontSetting.SmallFontSize, Mode=OneWay}" />
 
                 <TextBlock HorizontalAlignment="Right" TextAlignment="Right" VerticalAlignment="Center"

@@ -31,7 +31,8 @@
                             <MenuItem Header="{x:Static frame:Resources.ButtonHide}" Click="Hide_Click" />
                         </MenuItem>
                         <Separator />
-                        <!-- Donate button disabled until this fork has its own donation link. See App.xaml.cs Donate_Click. -->
+                        <!-- Donate stays hidden until a wallet address is configured. Shipping the
+                             menu item without one would send anyone who clicked it nowhere. -->
                         <MenuItem Header="{x:Static frame:Resources.ButtonGitHub}" Click="GitHub_Click" />
                         <MenuItem Header="{x:Static frame:Resources.ButtonUpdate}" Click="Update_Click" />
                         <MenuItem Header="{x:Static frame:Resources.ButtonClose}" Click="Close_Click" />
