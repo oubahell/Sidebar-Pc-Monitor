@@ -187,6 +187,10 @@ tagged commit, not from anyone's machine — see the
 
 Bug reports, layout packs and translations are welcome: [CONTRIBUTING.md](CONTRIBUTING.md).
 
+No telemetry, no analytics, no account. The app makes exactly two outbound
+requests — an update check, and an external-IP lookup that is off by default —
+both listed in the [privacy policy](PRIVACY.md).
+
 ## Credits
 
 Built on [**Sidebar Diagnostics**](https://github.com/ArcadeRenegade/SidebarDiagnostics) by
