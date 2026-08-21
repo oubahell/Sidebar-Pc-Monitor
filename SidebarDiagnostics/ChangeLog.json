@@ -1,5 +1,11 @@
 ﻿[
 	{
+		"Version": "4.0.9",
+		"Changes": [
+			"Uninstalling now removes the start-at-logon task. Third time lucky - the previous two fixes both still missed it."
+		]
+	},
+	{
 		"Version": "4.0.8",
 		"Changes": [
 			"Uninstalling now removes the start-at-logon task for real - the previous attempt still missed it."

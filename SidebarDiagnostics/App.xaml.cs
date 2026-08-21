@@ -131,16 +131,6 @@ namespace SidebarDiagnostics
         /// </remarks>
         private static void CleanUp()
         {
-            // Read before the settings file is deleted below - it is the most reliable signal we
-            // have that a logon task was ever created.
-            bool _startsAtLogon = false;
-
-            try
-            {
-                _startsAtLogon = Framework.Settings.Instance.RunAtStartup;
-            }
-            catch { }
-
             // Steps that need no extra rights come first, so they still happen even if the
             // elevated step below is refused.
             try
@@ -182,12 +172,12 @@ namespace SidebarDiagnostics
             // Registered at Highest run level by an elevated process, so removing it takes the
             // same rights. Left alone it survives as a logon task pointing at an exe that is gone.
             //
-            // Asked for unconditionally whenever we are elevating anyway. Gating this on the
-            // scheduler library reporting the task exists is what let one survive a real uninstall:
-            // the probe came back empty inside the hook even though the task was plainly there, so
-            // the step was never queued. schtasks on a task that is absent just says so and the
-            // batch carries on, which is a far better trade than missing one that is present.
-            if (_steps.Count > 0 || _startsAtLogon)
+            // Asked about with schtasks rather than the scheduler library. Two earlier attempts
+            // leaned on managed code here - TaskService.FindTask, then the saved RunAtStartup flag
+            // - and both came back empty inside the uninstall hook while the task sat plainly in
+            // the scheduler, so the step was never queued and the task outlived the app twice.
+            // Querying costs no elevation; only the delete does.
+            if (StartupTaskPresent())
             {
                 _steps.Add(string.Format("schtasks /delete /tn \"{0}\" /f", Constants.Generic.TASKNAME));
             }
@@ -217,6 +207,43 @@ namespace SidebarDiagnostics
                 }
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Whether the logon task exists, asked of schtasks rather than of managed code.
+        /// </summary>
+        /// <remarks>
+        /// Querying a task needs no elevation - only deleting one does - and schtasks answers the
+        /// same way inside the uninstall hook as it does anywhere else, which is more than can be
+        /// said for the managed scheduler API in that context.
+        /// </remarks>
+        private static bool StartupTaskPresent()
+        {
+            try
+            {
+                Process _probe = Process.Start(new ProcessStartInfo()
+                {
+                    FileName = "schtasks.exe",
+                    Arguments = string.Format("/query /tn \"{0}\"", Constants.Generic.TASKNAME),
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                });
+
+                if (_probe == null)
+                {
+                    return false;
+                }
+
+                _probe.WaitForExit(5000);
+
+                return _probe.HasExited && _probe.ExitCode == 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         protected async override void OnStartup(StartupEventArgs e)
