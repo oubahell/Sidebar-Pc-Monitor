@@ -1,5 +1,11 @@
 ﻿[
 	{
+		"Version": "4.0.15",
+		"Changes": [
+			"The download is about 3.7 MB smaller - uninstall.exe is now created during install instead of being shipped twice."
+		]
+	},
+	{
 		"Version": "4.0.14",
 		"Changes": [
 			"Removed 945 KB of unused libraries left over from the old updater - smaller download, same app."

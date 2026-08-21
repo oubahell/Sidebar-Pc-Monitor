@@ -24,7 +24,6 @@ repository:
 | Artifact | What it is |
 |---|---|
 | `SidebarPcMonitor.exe` | the application |
-| `uninstall.exe` | a copy of the above that hands over to the updater |
 | `SidebarPcMonitor-win-Setup.exe` | per-user installer |
 | `SidebarPcMonitor-win.msi` | machine-wide installer |
 

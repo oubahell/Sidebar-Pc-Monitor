@@ -43,6 +43,8 @@ namespace SidebarDiagnostics
             RunAsUninstallerIfNamedSo();
 
             VelopackApp.Build()
+                .OnAfterInstallFastCallback(_v => PlaceUninstaller())
+                .OnAfterUpdateFastCallback(_v => PlaceUninstaller())
                 .OnBeforeUninstallFastCallback(_v => CleanUp())
                 .Run();
         }
@@ -61,6 +63,39 @@ namespace SidebarDiagnostics
         /// runs the cleanup hook on the way through, and gets out of the way immediately: deleting
         /// this very folder while this process is holding its own exe open would not end well.
         /// </remarks>
+        /// <summary>
+        /// Writes uninstall.exe next to the app, on install and after each update.
+        /// </summary>
+        /// <remarks>
+        /// It is a copy of this executable - the app checks its own filename and, under that name,
+        /// hands over to Update.exe. See RunAsUninstallerIfNamedSo below.
+        ///
+        /// Made here rather than shipped in the package. Putting the copy in the package meant
+        /// every download carried the 3.7 MB application twice, which is a poor trade for a
+        /// convenience file; the update deltas carried it too. Copying it locally after install
+        /// costs nothing to download and leaves exactly the same file in the folder.
+        ///
+        /// An update replaces the whole "current" folder, so this has to run again afterwards.
+        /// </remarks>
+        private static void PlaceUninstaller()
+        {
+            try
+            {
+                string _exe = Process.GetCurrentProcess().MainModule.FileName;
+                string _target = Path.Combine(Path.GetDirectoryName(_exe), UNINSTALL_NAME + ".exe");
+
+                if (!string.Equals(_exe, _target, StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Copy(_exe, _target, true);
+                }
+            }
+            catch
+            {
+                // Add/Remove Programs is the supported route and is registered either way. Failing
+                // to place a convenience copy is not worth failing an install over.
+            }
+        }
+
         private static void RunAsUninstallerIfNamedSo()
         {
             string _exe = Process.GetCurrentProcess().MainModule.FileName;

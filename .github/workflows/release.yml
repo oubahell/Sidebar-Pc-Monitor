@@ -93,11 +93,6 @@ jobs:
           Get-ChildItem stage -Include *.pdb, *.xml -Recurse | Remove-Item -Force
           if (-not (Test-Path "stage\SidebarPcMonitor.exe")) { throw "SidebarPcMonitor.exe missing from the staged build" }
 
-          # Velopack registers the app in Add/Remove Programs but writes no uninstaller into the
-          # folder, and people open the folder and look for one. The app recognises this name and
-          # hands over to Update.exe --uninstall. A copy rather than a purpose-built stub, because
-          # it lands beside the DLLs it needs in order to start at all.
-          Copy-Item "stage\SidebarPcMonitor.exe" "stage\uninstall.exe"
 
       - name: Package
         shell: pwsh
